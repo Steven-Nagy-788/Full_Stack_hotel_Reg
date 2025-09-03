@@ -36,19 +36,19 @@
 ### **Part 2: Frontend Development (User Interface)**
 *(Primary Owner: Frontend / Full-Stack Developer)*
 
-*   **Task 2.1: Build Main Layout & Navigation**
+*   **Task 2.1: Build Main Layout & Navigation**    veronia
     *   **Description:** Create the main layout for the public-facing site, including the header (Logo, Hotels, My Bookings) and footer.
     *   **Wireframes:** Home Search, Hotel Details
 
-*   **Task 2.2: Build Home Search & Results Page**
+*   **Task 2.2: Build Home Search & Results Page**   veronia
     *   **Description:** Develop the home page with the search form. Implement the functionality to call the search API and display the list of matching hotels.
     *   **Wireframes:** Home Search, Results List
 
-*   **Task 2.3: Build Hotel Details Page**
+*   **Task 2.3: Build Hotel Details Page**   veronia
     *   **Description:** Develop the page that shows details for a single hotel. This page must list available room types and prices for the user's selected dates and allow them to proceed to booking.
     *   **Wireframe:** Hotel Details
 
-*   **Task 2.4: Build Booking Flow Page**
+*   **Task 2.4: Build Booking Flow Page**  
     *   **Description:** Create the final booking form where a user confirms their details and submits the reservation request to the backend.
     *   **Wireframe:** Booking Flow
 
@@ -64,15 +64,15 @@
 ### **Part 3: Frontend Development (Admin Dashboard)**
 *(Primary Owner: Frontend / Full-Stack Developer)*
 
-*   **Task 3.1: Build Admin Layout & Navigation**
+*   **Task 3.1: Build Admin Layout & Navigation**   veronia 
     *   **Description:** Create a distinct layout for the admin section, featuring a sidebar for navigating between different management pages (Dashboard, Hotels, etc.).
     *   **Wireframe:** Dashboard
 
-*   **Task 3.2: Build Admin Dashboard Home**
+*   **Task 3.2: Build Admin Dashboard Home** veronia
     *   **Description:** Develop the main dashboard view that fetches and displays a list of all `PENDING` reservations, with buttons to trigger the confirm/reject API calls.
     *   **Wireframe:** Dashboard
 
-*   **Task 3.3: Build Hotels Management Page**
+*   **Task 3.3: Build Hotels Management Page**  veronia
     *   **Description:** Create the UI for Admins to view a list of all hotels, and include forms (e.g., in modals) for adding, editing, and deleting hotels.
     *   **Wireframe:** Hotels Management
 
