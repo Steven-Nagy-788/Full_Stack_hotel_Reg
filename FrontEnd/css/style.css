@@ -1,0 +1,215 @@
+* {
+    padding: 0px;
+    margin: 0px;
+    box-sizing: border-box;
+    text-decoration: none;
+    font-family: "Poppins", sans-serif;
+
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+.title,
+.subtitle {
+    font-family: "Oswald", sans-serif;
+
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #fff;
+    border-bottom: 2px solid rgb(0, 169, 241);
+    width: 100%;
+    height: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 500;
+
+}
+
+.header .navbar {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.logo-link {
+    width: 140px;
+    font-size: 19.7px;
+    font-weight: 500;
+    color: rgb(0, 169, 241);
+    text-transform: uppercase;
+    font-family: "Oswald", sans-serif;
+text-decoration: none;
+
+
+}
+ .logo-link span {
+    font-size: 19.7px;
+    font-weight: 300;
+    color: #444;
+    letter-spacing: 1px;
+    text-transform: lowercase;
+    margin-left: -1px;
+    font-family: "Popins", sans-serif;
+
+}
+
+.navigation {
+    display: flex;
+    gap: 0.6rem;
+}
+
+.header .navbar .navigation .link {
+    position: relative;
+    padding: 10px;
+    text-transform: capitalize;
+    font-size: 16px;
+    font-weight: 400;
+    color: #444;
+    transition: all 1s;
+    text-decoration: none;
+}
+
+.header .navbar .navigation .link:hover {
+    color: rgb(0, 169, 241);
+}
+
+.header .navbar .navigation .link::after {
+    position: absolute;
+    content: '';
+    bottom: 2px;
+    left: 50%;
+    width: 2px;
+    height: 2px;
+    background-color: #fff;
+    transition: all 1s;
+    transform: translateX(-50%);
+}
+
+.header .navbar .navigation .link:hover::after {
+    width: 60%;
+    background-color: rgb(0, 169, 241);
+
+}
+
+.header .navbar .controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1.2em;
+    width: 50%;
+}
+
+.header .navbar .controls .icon {
+    position: relative;
+    height: 34px;
+    width: 34px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 19px;
+    font-weight: 400;
+    color: #111;
+    transition: all 1s;
+    cursor: pointer;
+    border-radius: 50%;
+    border: 1.8px solid #eee;
+}
+
+.header .navbar .controls .icon:hover {
+    background-color: #000000;
+    color: #fff !important;
+}
+/* ****************************form************************************* */
+
+.section-form {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 45%;
+    min-height: 45%;
+    line-height: 20px;
+    background-color: rgb(255, 255, 255);
+    padding: 40px 20px;
+    border-radius: 10px;
+    z-index: 100;
+}
+.section-form form input[type="text"],
+.section-form form input[type="password"] {
+    display: block;
+    width: 100%;
+    margin: 10px 0px;
+    height: 30px;
+}
+
+input {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 3px;
+    outline: none;
+}
+
+.section-form form #email {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 5px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    outline: none;
+}
+
+.section-form form input[type="submit"] {
+    font-size: 15px;
+    height: auto;
+    cursor: pointer;
+    width: 80px;
+    color: white;
+    background-color:  rgb(0, 169, 241);
+    font-weight: 600;
+    margin: 10px 5px;
+}
+
+.section-form form input[type="submit"]:hover {
+    opacity: .5;
+}
+
+.Homepage-section {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: url("../img/beautiful-luxury-swimming-pool.jpg") no-repeat center center;
+  background-size: cover;
+}
+
+.Homepage-section::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4); /* dark overlay */
+}
+
+#form_title{
+    width: 140px;
+    font-size: 19.7px;
+    font-weight: 500;
+    color: rgb(0, 169, 241);
+    text-transform: uppercase;
+    font-family: "Oswald", sans-serif;
+    text-decoration: none;
+}
+
+/* ////////////////////////////////////////homepage///////////////////////////////////// */
+
+home_title
