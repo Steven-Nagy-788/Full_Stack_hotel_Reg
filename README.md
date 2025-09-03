@@ -56,7 +56,7 @@
     *   **Description:** Develop the page where logged-in users can see a list of their past and upcoming bookings, view their status, and access the cancel functionality.
     *   **Wireframe:** My Bookings
 
-*   **Task 2.6: Style Authentication Pages**
+*   **Task 2.6: Style Authentication Pages**  veronia
     *   **Description:** Apply the project's CSS styling to the pre-built Login and Registration pages to ensure a consistent look and feel.
 
 ---
@@ -72,7 +72,7 @@
     *   **Description:** Develop the main dashboard view that fetches and displays a list of all `PENDING` reservations, with buttons to trigger the confirm/reject API calls.
     *   **Wireframe:** Dashboard
 
-*   **Task 3.3: Build Hotels Management Page**  veronia
+*   **Task 3.3: Build Hotels Management Page**  
     *   **Description:** Create the UI for Admins to view a list of all hotels, and include forms (e.g., in modals) for adding, editing, and deleting hotels.
     *   **Wireframe:** Hotels Management
 
