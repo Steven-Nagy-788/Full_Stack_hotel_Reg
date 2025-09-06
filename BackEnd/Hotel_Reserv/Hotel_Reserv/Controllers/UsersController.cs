@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Hotel_Reserv.Data;
 using Hotel_Reserv.Models;
+using Hotel_Reserv.Services;
 
 namespace Hotel_Reserv.Controllers
 {
@@ -15,10 +16,11 @@ namespace Hotel_Reserv.Controllers
     public class UsersController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-
-        public UsersController(ApplicationDbContext context)
+        private readonly IPasswordHasher _passwordHasher;
+        public UsersController(ApplicationDbContext context, IPasswordHasher passwordHasher)
         {
             _context = context;
+            _passwordHasher = passwordHasher;
         }
 
         // GET: api/Users
@@ -82,7 +84,7 @@ namespace Hotel_Reserv.Controllers
             {
                 Name = userDto.Name,
                 Email = userDto.Email,
-                Password_Hash = userDto.Password_Hash,
+                Password_Hash = _passwordHasher.Hash(userDto.Password_Hash),
                 Role = userDto.Role
             };
             _context.Users.Add(user);
