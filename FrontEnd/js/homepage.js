@@ -91,3 +91,6 @@ if (localStorage.getItem("firstname")) {
     userInfo.style.display = "block"
     userD.innerHTML = "Hello," + localStorage.getItem("firstname").toString()
 }
+
+// Set current year in footer
+document.getElementById("year").textContent = new Date().getFullYear();

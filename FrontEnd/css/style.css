@@ -462,3 +462,73 @@ input {
     height: 150px;
     object-fit: cover;
 }
+/* ================== Footer ================== */
+.footer {
+    background-color: #111;
+    color: #eee;
+    padding: 50px 20px 25px;  /* مساحة مريحة فوق وتحت */
+    margin-top: 60px;
+    font-size: 15px;
+}
+
+.footer .footer-col {
+    margin-bottom: 30px; /* مسافة بين الأعمدة في الموبايل */
+}
+
+.footer h3,
+.footer h5 {
+    color: rgb(0, 169, 241);
+    margin-bottom: 18px;
+    font-weight: 600;
+}
+
+.footer p {
+    font-size: 14px;
+    line-height: 1.8;
+    margin-bottom: 0;
+}
+
+.footer ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer ul li {
+    margin-bottom: 10px; /* مسافة أكبر بين اللينكات */
+}
+
+.footer ul li a {
+    color: #eee;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer ul li a:hover {
+    color: rgb(0, 169, 241);
+}
+
+.footer .social-icons {
+    margin-top: 5px;
+}
+
+.footer .social-icons a {
+    display: inline-block;
+    margin-right: 12px;
+    color: #eee;
+    font-size: 20px;
+    transition: color 0.3s;
+}
+
+.footer .social-icons a:hover {
+    color: rgb(0, 169, 241);
+}
+
+.footer-bottom {
+    border-top: 1px solid #333;
+    text-align: center;
+    padding-top: 15px;
+    margin-top: 30px;
+    font-size: 13px;
+    color: #aaa;
+}
