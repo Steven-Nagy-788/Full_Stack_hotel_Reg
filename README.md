@@ -64,22 +64,22 @@
 ### **Part 3: Frontend Development (Admin Dashboard)**
 *(Primary Owner: Frontend / Full-Stack Developer)*
 
-*   **Task 3.1: Build Admin Layout & Navigation**   veronia 
+*   **Task 3.1: Build Admin Layout & Navigation**   veronia , Elaria
     *   **Description:** Create a distinct layout for the admin section, featuring a sidebar for navigating between different management pages (Dashboard, Hotels, etc.).
     *   **Wireframe:** Dashboard
 
-*   **Task 3.2: Build Admin Dashboard Home** veronia
+*   **Task 3.2: Build Admin Dashboard Home** veronia , Elaria
     *   **Description:** Develop the main dashboard view that fetches and displays a list of all `PENDING` reservations, with buttons to trigger the confirm/reject API calls.
     *   **Wireframe:** Dashboard
 
-*   **Task 3.3: Build Hotels Management Page**  
+*   **Task 3.3: Build Hotels Management Page**  Elaria
     *   **Description:** Create the UI for Admins to view a list of all hotels, and include forms (e.g., in modals) for adding, editing, and deleting hotels.
     *   **Wireframe:** Hotels Management
 
-*   **Task 3.4: Build Room Types Management UI**
+*   **Task 3.4: Build Room Types Management UI** Elaria
     *   **Description:** On the hotel management page, build the interface that allows Admins to manage the room types for the selected hotel.
     *   **Wireframe:** Room Types
 
-*   **Task 3.5: Build Inventory Calendar UI**
+*   **Task 3.5: Build Inventory Calendar UI** Elaria
     *   **Description:** Develop the calendar-based interface for Admins to manage room availability. This will require a date picker and a form to submit inventory updates.
     *   **Wireframe:** Inventory Calendar
