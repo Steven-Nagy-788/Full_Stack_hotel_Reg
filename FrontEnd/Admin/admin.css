@@ -1,0 +1,28 @@
+body {
+  background: url('../img/beautiful-luxury-swimming-pool.jpg')
+              no-repeat center center fixed;
+  background-size: cover;
+  font-family: Arial, sans-serif;
+}
+.sidebar {
+  height: 100vh;
+  background-color: rgba(4, 49, 70, 0.85);
+  padding-top: 20px;
+}
+.sidebar a {
+  color: white;
+  text-decoration: none;
+  display: block;
+  padding: 12px;
+  margin: 5px 0;
+  border-radius: 5px;
+}
+.sidebar a:hover {
+  background-color: #17a2b8;
+}
+.content {
+  background-color: rgba(255,255,255,0.95);
+  border-radius: 10px;
+  padding: 20px;
+  min-height: 90vh;
+}
