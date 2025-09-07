@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Hotel_Reserv.Data;
 using Hotel_Reserv.Models;
 using Hotel_Reserv.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Hotel_Reserv.Controllers
 {
@@ -23,6 +24,35 @@ namespace Hotel_Reserv.Controllers
             _passwordHasher = passwordHasher;
         }
 
+        [HttpPost("register")]
+        public async ValueTask<IResult> PostUser(UserRegDto userDto)
+        {
+            var userExists = await _context.Users.AnyAsync(u => u.Email == userDto.Email);
+            if (userExists)
+                return Results.Conflict();
+            var user = new User
+            {
+                Name = userDto.Name,
+                Email = userDto.Email,
+                Password_Hash = _passwordHasher.Hash(userDto.Password_Hash),
+                Role = userDto.Role
+            };
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+            return Results.Created($"/api/users/{user.Id}", user);
+        }
+
+        [HttpPost("login")]
+        public async ValueTask<IResult> LoginUser(UserLoginDto userLoginDto)
+        {
+            var userExists = await _context.Users.Where(u => u.Email == userLoginDto.Email).FirstOrDefaultAsync();
+            if (userExists is null)
+                return Results.NotFound();
+            var correctPassword =_passwordHasher.Verify(userLoginDto.Password_Hash, userExists.Password_Hash!);
+            if (!correctPassword)
+                return Results.Unauthorized();
+            return Results.Ok(userExists);
+        }
         // GET: api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
@@ -73,24 +103,6 @@ namespace Hotel_Reserv.Controllers
             }
 
             return NoContent();
-        }
-
-        // POST: api/Users
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<User>> PostUser(UserDto userDto)
-        {
-            var user = new User
-            {
-                Name = userDto.Name,
-                Email = userDto.Email,
-                Password_Hash = _passwordHasher.Hash(userDto.Password_Hash),
-                Role = userDto.Role
-            };
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
 
         // DELETE: api/Users/5
