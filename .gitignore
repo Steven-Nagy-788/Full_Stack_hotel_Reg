@@ -399,3 +399,4 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 /Properties
+/BackEnd/Hotel_Reserv/.vs/Hotel_Reserv/v17
