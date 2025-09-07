@@ -1,3 +1,71 @@
+
+
+let check_btn = document.getElementById("check_btn");
+
+async function searchHotels() {
+
+    const checkIn = document.getElementById('in').value;
+    const checkOut = document.getElementById('out').value;
+    const guests = document.getElementById('Guests').value;
+    const rooms = document.getElementById('rooms').value;
+    const city = document.getElementById("city").value;
+  try {
+        const res = await fetch("http://localhost:5000/api/hotels"); 
+        const hotels = await res.json();
+
+        
+        const filteredHotels = hotels.filter(hotel => {
+            return (!city || hotel.city.toLowerCase() === city.toLowerCase()) &&
+                   (!guests || hotel.guests >= guests) &&
+                   (!rooms || hotel.rooms >= rooms);
+        });
+
+       
+        const results = document.getElementById("results");
+        results.innerHTML = "";
+
+        if (filteredHotels.length === 0) {
+            results.innerHTML = `<p style="color:white;">No hotels found for your search.</p>`;
+        } else {
+            filteredHotels.forEach(hotel => {
+                const card = `
+                    <div class="hotel-card">
+                        <img src="${hotel.image}" alt="${hotel.name}">
+                        <h3>${hotel.name}</h3>
+                        <p>City: ${hotel.city}</p>
+                        <p>Guests: ${hotel.guests}</p>
+                        <p>Rooms: ${hotel.rooms}</p>
+                        <p>Check in: ${hotel.checkIn}</p>
+                        <p>Check out: ${hotel.checkOut}</p>
+                    </div>
+                `;
+                results.innerHTML += card;
+            });
+        }
+
+        // Scroll smoothly to results
+        results.scrollIntoView({ behavior: "smooth" });
+
+    } catch (err) {
+        console.error("Error fetching hotels:", err);
+    }
+
+}
+
+
+const inputs = document.querySelectorAll(".form input, .form select");
+inputs.forEach(input => {
+    input.addEventListener("input", searchHotels);
+    input.addEventListener("change", searchHotels);
+});
+
+
+const form = document.querySelector('.form');
+form.addEventListener('submit', function(e){
+    e.preventDefault();  
+    searchHotels();
+});
+
 let loginBtn = document.getElementById("Login");
 let registerBtn = document.getElementById("Register");
 loginBtn.addEventListener("click", function(e) {
