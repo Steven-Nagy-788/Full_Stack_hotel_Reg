@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿
+using Azure.Core;
 using Hotel_Reserv.Data;
 using Hotel_Reserv.Models;
-using Hotel_Reserv.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Hotel_Reserv.Controllers
 {
@@ -17,8 +14,8 @@ namespace Hotel_Reserv.Controllers
     public class UsersController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly IPasswordHasher _passwordHasher;
-        public UsersController(ApplicationDbContext context, IPasswordHasher passwordHasher)
+        private readonly IPasswordHasher<User> _passwordHasher;
+        public UsersController(ApplicationDbContext context, IPasswordHasher<User> passwordHasher)
         {
             _context = context;
             _passwordHasher = passwordHasher;
@@ -34,10 +31,10 @@ namespace Hotel_Reserv.Controllers
             {
                 Name = userDto.Name,
                 Email = userDto.Email,
-                Password_Hash = _passwordHasher.Hash(userDto.Password_Hash),
                 Role = userDto.Role
             };
-            _context.Users.Add(user);
+            user.Password_Hash = _passwordHasher.HashPassword(user, userDto.Password_Hash);
+            await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
             return Results.Created($"/api/users/{user.Id}", user);
         }
@@ -45,10 +42,10 @@ namespace Hotel_Reserv.Controllers
         [HttpPost("login")]
         public async ValueTask<IResult> LoginUser(UserLoginDto userLoginDto)
         {
-            var userExists = await _context.Users.Where(u => u.Email == userLoginDto.Email).FirstOrDefaultAsync();
+            var userExists = await _context.Users.FirstOrDefaultAsync(u => u.Email == userLoginDto.Email);
             if (userExists is null)
-                return Results.NotFound();
-            var correctPassword =_passwordHasher.Verify(userLoginDto.Password_Hash, userExists.Password_Hash!);
+                return Results.Unauthorized();
+            var correctPassword =_passwordHasher.VerifyHashedPassword(userExists, userExists.Password_Hash!, userLoginDto.Password_Hash) == PasswordVerificationResult.Success;
             if (!correctPassword)
                 return Results.Unauthorized();
             return Results.Ok(userExists);

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Hotel_Reserv.Data;
 using Hotel_Reserv.Models;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
 namespace Hotel_Reserv.Controllers
 {
@@ -21,25 +22,17 @@ namespace Hotel_Reserv.Controllers
             _context = context;
         }
 
-        // GET: api/Hotels
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Hotel>>> GetHotels()
+        public async ValueTask<IResult> GetHotels()
         {
-            return await _context.Hotels.ToListAsync();
+            return Results.Ok(await _context.Hotels.ToListAsync());
         }
 
-        // GET: api/Hotels/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Hotel>> GetHotel(int id)
+        public async ValueTask<IResult> GetHotel(int id)
         {
             var hotel = await _context.Hotels.FindAsync(id);
-
-            if (hotel == null)
-            {
-                return NotFound();
-            }
-
-            return hotel;
+            return hotel is not null ? Results.Ok(hotel) : Results.NotFound();
         }
 
         // PUT: api/Hotels/5
@@ -72,16 +65,21 @@ namespace Hotel_Reserv.Controllers
 
             return NoContent();
         }
-
-        // POST: api/Hotels
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Hotel>> PostHotel(Hotel hotel)
+        public async ValueTask<IResult> PostHotel(HotelDto hotelDto)
         {
-            _context.Hotels.Add(hotel);
+            var hotel = new Hotel
+            {
+                Name = hotelDto.Name,
+                City = hotelDto.City,
+                Address = hotelDto.Address,
+                Description = hotelDto.Description,
+                Stars = hotelDto.Stars,
+                Thumbnail_url = hotelDto.Thumbnail_url
+            };
+            await _context.Hotels.AddAsync(hotel);
             await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetHotel", new { id = hotel.Id }, hotel);
+            return Results.Created($"api/Hotels/{hotel.Id}", hotel);
         }
 
         // DELETE: api/Hotels/5

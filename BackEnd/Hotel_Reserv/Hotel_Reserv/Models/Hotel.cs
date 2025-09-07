@@ -1,4 +1,5 @@
 ﻿namespace Hotel_Reserv.Models;
+public record HotelDto(string Name, string City, string Address, string Description, int Stars, string Thumbnail_url);
 public class Hotel
 {
     public int Id { get; set; }
@@ -8,6 +9,6 @@ public class Hotel
     public string? Description { get; set; }
     public int Stars { get; set; }
     public string? Thumbnail_url { get; set; }
-    public DateTime Created { get; set; } = DateTime.UtcNow;
+    public DateTime Created_At { get; set; } = DateTime.UtcNow;
     public virtual ICollection<RoomType>? RoomTypes { get; set; }
 }
