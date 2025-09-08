@@ -208,6 +208,24 @@ input {
     opacity: .5;
 }
 
+/*.Homepage-section {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background: url("../img/beautiful-luxury-swimming-pool.jpg") no-repeat center center;
+    background-size: cover;
+}
+
+.Homepage-section::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    
+}*/
 
 #form_title {
     width: 140px;
