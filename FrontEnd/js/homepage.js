@@ -27,7 +27,7 @@ async function searchHotels() {
         if (filteredHotels.length === 0) {
             results.innerHTML = `<p style="color:white;">No hotels found for your search.</p>`;
         } else {
-            filteredHotels.forEach(hotel => {
+           filteredHotels.forEach(hotel => {
                 const card = `
                     <div class="hotel-card">
                         <img src="${hotel.image}" alt="${hotel.name}">
@@ -37,10 +37,12 @@ async function searchHotels() {
                         <p>Rooms: ${hotel.rooms}</p>
                         <p>Check in: ${hotel.checkIn}</p>
                         <p>Check out: ${hotel.checkOut}</p>
+                        <a href="hotel-details.html?id=${hotel.id}" class="btn btn-primary mt-2">View Details</a>
                     </div>
                 `;
                 results.innerHTML += card;
             });
+
         }
 
         // Scroll smoothly to results
