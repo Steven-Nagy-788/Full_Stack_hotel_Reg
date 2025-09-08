@@ -1,6 +1,8 @@
-﻿using Hotel_Reserv.Data;
+﻿using Azure.Core;
+using Hotel_Reserv.Data;
 using Hotel_Reserv.Models;
 using Hotel_Reserv.Models.Dtos;
+using Hotel_Reserv.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,115 +12,61 @@ namespace Hotel_Reserv.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class UsersController(IAuthService authservice) : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IPasswordHasher<User> _passwordHasher;
-        public UsersController(ApplicationDbContext context, IPasswordHasher<User> passwordHasher)
-        {
-            _context = context;
-            _passwordHasher = passwordHasher;
-        }
-
         [HttpPost("register")]
-        public async ValueTask<IResult> PostUser(UserDtoReg userDto)
+        public async ValueTask<ActionResult> PostUser(UserDtoReg request)
         {
-            var userExists = await _context.Users.AnyAsync(u => u.Email == userDto.Email);
-            if (userExists)
-                return Results.Conflict();
-            var user = new User
-            {
-                Name = userDto.UserName,
-                Email = userDto.Email
-            };
-            user.Password_Hash = _passwordHasher.HashPassword(user, userDto.PassWord);
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
-            return Results.Created($"/api/users/{user.Id}", user);
+            var user = await authservice.RegisterAsync(request);
+            if (user is null) { return BadRequest("Email already exists"); }
+            return Ok("account created");
         }
 
-        [HttpPost("login")]
-        public async ValueTask<IResult> LoginUser(UserDtoLog userLoginDto)
+        [HttpPost("Login")]
+        public async ValueTask<ActionResult<string>> Login(UserDtoLog request)
         {
-            var userExists = await _context.Users.FirstOrDefaultAsync(u => u.Email == userLoginDto.Email);
-            if (userExists is null)
-                return Results.Unauthorized();
-            var correctPassword =_passwordHasher.VerifyHashedPassword(userExists, userExists.Password_Hash!, userLoginDto.PassWord) == PasswordVerificationResult.Success;
-            if (!correctPassword)
-                return Results.Unauthorized();
-            return Results.Ok(userExists);
+            var token = await authservice.LoginAsync(request);
+            if (token is null) { return BadRequest("invalid user name or password"); }
+            return Ok(token);
         }
-        // GET: api/Users
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        [HttpGet("GetAllUsers")]
+        [Authorize(Roles = "Admin")]
+        public async ValueTask<ActionResult<List<UserDto>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
-        }
-
-        // GET: api/Users/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
-        {
-            var user = await _context.Users.FindAsync(id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return user;
+            var users = await authservice.GetUsersAsync();
+            if (users == null || users.Count == 0)
+                return NotFound("No users found.");
+            return Ok(users);
         }
 
-        // PUT: api/Users/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
+
+
+        [HttpPost("create_User")]
+        [Authorize(Roles = "Admin")]
+        public async ValueTask<ActionResult> CreateUser(UserDtoReg obj)
         {
-            if (id != user.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(user).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            var user = await authservice.CreateUserAsync(obj);
+            if (user is null) { return BadRequest("Email already exists"); }
+            return Ok("account created");
         }
 
-        // DELETE: api/Users/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+
+
+        [HttpPut("UpdateUser_{id:int}")]
+        [Authorize(Roles = "Admin")]
+        public async ValueTask<ActionResult> UpdateUser(int id, UserDtoReg obj)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            var user= await authservice.UpdateUserAsync(id, obj);
+            if (obj is null) { return BadRequest("INVALID OBJCT"); }
+            return Ok(obj);
         }
-
-        private bool UserExists(int id)
+        [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Admin")]
+        public async ValueTask<ActionResult> DeleteUser(int id)
         {
-            return _context.Users.Any(e => e.Id == id);
+            var user = await authservice.DeleteUserAsync(id);
+            if (user is null) { return NotFound(); }
+            return Ok("user is deleted ");
         }
     }
 }

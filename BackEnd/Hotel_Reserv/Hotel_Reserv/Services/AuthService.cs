@@ -2,6 +2,7 @@
 using Hotel_Reserv.Models;
 using Hotel_Reserv.Models.Dtos;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -32,6 +33,51 @@ namespace Hotel_Reserv.Services
             if (new PasswordHasher<User>().VerifyHashedPassword(user, user.Password_Hash, request.PassWord) == PasswordVerificationResult.Failed)
             { return null; }
             return CreateToken(user);
+        }
+        public async ValueTask<List<UserDto>?> GetUsersAsync()
+        {
+            return await db.Users
+                           .Select(i => new UserDto
+                           {
+                               Id = i.Id,
+                               Name = i.Name,
+                               Role = i.Role,
+                               Email = i.Email
+                           })
+                           .ToListAsync();
+        }
+        public async ValueTask<User?> CreateUserAsync(UserDtoReg request)
+        {
+            if (await db.Users.AnyAsync(u => u.Email == request.Email)) { return null; }
+            var user = new User() { };
+            var hashedpassword = new PasswordHasher<User>().HashPassword(user, request.PassWord);
+            user.Name = request.UserName;
+            user.Role = request.Role;
+            user.Password_Hash = hashedpassword;
+            user.Email = request.Email;
+            db.Users.Add(user);
+            await db.SaveChangesAsync();
+            return user;
+        }
+        public async ValueTask<User?> UpdateUserAsync(int id,UserDtoReg upd)
+        {
+            var user =await db.Users.FirstOrDefaultAsync(i => i.Id == id);
+            if (user is null) { return null; }
+            user.Name = upd.UserName;
+            user.Email = upd.Email;
+            var hashedpassword = new PasswordHasher<User>().HashPassword(user,upd.PassWord);
+            user.Password_Hash = hashedpassword;
+            user.Role= upd.Role;
+            db.SaveChanges();
+            return user;
+        }
+        public async ValueTask<User?> DeleteUserAsync(int id)
+        {
+            var user =await db.Users.FindAsync(id);
+            if (user is null) { return user; }
+            db.Users.Remove(user);
+            db.SaveChanges();
+            return user ;
         }
         /*private string GenerateRefreshToken()
         {
@@ -71,5 +117,7 @@ namespace Hotel_Reserv.Services
             return new JwtSecurityTokenHandler().WriteToken(tokendescriptor);
 
         }
+
+
     }
 }
