@@ -109,11 +109,22 @@ html {
 }
 
 
+
 .startbuttons {
 display: flex;
 justify-content: right;
 align-items: center;
 margin-left: 20px;
+}
+/* ================== Homepage Section ================== */
+
+.Homepage-section {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background: url("/img/beautiful-luxury-swimming-pool.jpg") no-repeat center center;
+    background-size: cover;
+
 }
 
 .startbuttons .Login,
@@ -191,7 +202,6 @@ input {
 .section-form form input[type="submit"]:hover {
     opacity: .5;
 }
-
 
 
 
