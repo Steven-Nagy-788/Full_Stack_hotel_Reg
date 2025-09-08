@@ -400,3 +400,10 @@ FodyWeavers.xsd
 *.sln.iml
 /Properties
 /BackEnd/Hotel_Reserv/.vs/Hotel_Reserv/v17
+/BackEnd/Hotel_Reserv/.idea
+/BackEnd/Hotel_Reserv/Hotel_Reserv/Migrations
+BackEnd/Hotel_Reserv/Hotel_Reserv/Migrations/ApplicationDbContextModelSnapshot.cs
+BackEnd/Hotel_Reserv/Hotel_Reserv/packages-microsoft-prod.deb
+/BackEnd/Hotel_Reserv/Hotel_Reserv/Migrations
+BackEnd/Hotel_Reserv/Hotel_Reserv/Migrations/ApplicationDbContextModelSnapshot.cs
+BackEnd/Hotel_Reserv/Hotel_Reserv/Migrations/ApplicationDbContextModelSnapshot.cs
