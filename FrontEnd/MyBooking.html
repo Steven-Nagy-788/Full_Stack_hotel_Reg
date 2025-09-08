@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Bookings - SummerClock</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="css/MyBooking.css" rel="stylesheet">
+</head>
+<body>
+  <!-- 🔹 Fixed Header -->
+  <header class="header" id="header">
+    <nav class="navbar navbar-expand-md">
+      <a href="homepage.html" class="logo-link navbar-brand">Summer<span>Clock</span></a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navigation" aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"><i class="fas fa-bars"></i></span>
+      </button>
+
+      <div class="collapse navbar-collapse navigation" id="navigation">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item"><a href="homepage.html" class="nav-link link">Home</a></li>
+          <li class="nav-item"><a href="HotelDetails.html" class="nav-link link">Hotels</a></li>
+          <li class="nav-item"><a href="mybookings.html" class="nav-link link active">My Bookings</a></li>
+          <li class="nav-item"><a href="contact.html" class="nav-link link">Contact</a></li>
+        </ul>
+      </div>
+
+      <div id="user_info" style="display:none; margin-left: 60px;">
+        <span id="user"></span>
+        <button id="Logout" class="btn btn-danger" style="margin-left: 10px;">Logout</button>
+      </div>
+
+      <div class="startbuttons" id="links">
+        <div class="Login">
+          <button class="btn" id="Login">Login</button>
+        </div>
+        <div class="Register">
+          <button class="btn" id="Register">Register</button>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- 🔹 Section with background & overlay -->
+  <section class="page-section">
+    <div class="overlay"></div>
+    <div class="container bookings-container">
+      <h2 class="text-white"><i class="fa-solid fa-calendar-check"></i> My Bookings</h2>
+      <p class="text-light">Here are your current and past reservations:</p>
+      <div class="table-responsive bg-white p-3 rounded">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Hotel</th>
+              <th>Room</th>
+              <th>Check-in</th>
+              <th>Check-out</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="myBookingsTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <script src="hotel-details.js"></script>
+  <script>
+    let myBookings = [
+      {id:1, hotel:"Hilton Cairo", room:"Deluxe", checkin:"2025-09-10", checkout:"2025-09-15", status:"Pending"},
+      {id:2, hotel:"Four Seasons", room:"Suite", checkin:"2025-09-20", checkout:"2025-09-25", status:"Confirmed"},
+      {id:3, hotel:"Marriott", room:"Standard", checkin:"2025-08-01", checkout:"2025-08-05", status:"Rejected"}
+    ];
+
+    function renderBookings(){
+      let tbody = document.getElementById("myBookingsTable");
+      tbody.innerHTML = myBookings.map(b=>`
+        <tr>
+          <td>${b.id}</td>
+          <td>${b.hotel}</td>
+          <td>${b.room}</td>
+          <td>${b.checkin}</td>
+          <td>${b.checkout}</td>
+          <td>
+            <span class="badge ${b.status=="Pending"?"bg-warning":b.status=="Confirmed"?"bg-success":"bg-danger"}">
+              ${b.status}
+            </span>
+          </td>
+          <td>
+            ${b.status=="Pending" ? `<button class="btn btn-danger btn-sm" onclick="cancelBooking(${b.id})"><i class="fa-solid fa-xmark"></i> Cancel</button>` : ""}
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function cancelBooking(id){
+      let booking = myBookings.find(b=>b.id==id);
+      if(booking){ booking.status="Cancelled"; renderBookings(); }
+    }
+
+    renderBookings();
+  </script>
+</body>
+</html>
