@@ -37,7 +37,36 @@ async function loadHotelDetails() {
   }
 }
 
-// Set current year in footer
-document.getElementById("year").textContent = new Date().getFullYear();
+// Login / Logout + Hello username
+document.addEventListener("DOMContentLoaded", function () {
+    let userInfo = document.querySelector("#user_info");
+    let userD = document.querySelector("#user");
+    let logout_btn = document.querySelector("#Logout");
+    let links = document.querySelector("#links"); // لو عندك div فيه login/register buttons
 
+    if (localStorage.getItem("firstname")) {
+        if (links) links.style.display = "none";
+        if (userInfo) userInfo.style.display = "block";
+        if (userD) userD.innerHTML = "Hello, " + localStorage.getItem("firstname");
+    } else {
+        if (links) links.style.display = "flex";
+        if (userInfo) userInfo.style.display = "none";
+    }
+
+    if (logout_btn) {
+        logout_btn.addEventListener("click", function () {
+            localStorage.removeItem("firstname");
+            localStorage.removeItem("lastname");
+            localStorage.removeItem("email");
+            localStorage.removeItem("password");
+            window.location = "homepage.html";
+        });
+    }
+
+    // Set current year in footer
+    const yearSpan = document.getElementById("year");
+    if (yearSpan) yearSpan.textContent = new Date().getFullYear();
+});
+
+// Load hotel details
 loadHotelDetails();
