@@ -1,23 +1,27 @@
-// old login/register buttons
-let loginBtn = document.getElementById("Login");
-let registerBtn = document.getElementById("Register");
-if (loginBtn) {
-    loginBtn.addEventListener("click", function(e) {
-        setTimeout(() => {
-            window.location = "login.html"
-        }, 100)
-    })
-}
-if (registerBtn) {
-    registerBtn.addEventListener("click", function(e) {
-        setTimeout(() => {
-            window.location = "register.html"
-        }, 100)
-    })
-}
-
-// show username + logout
 document.addEventListener("DOMContentLoaded", function () {
+    // login/register buttons
+    let loginBtn = document.getElementById("Login");
+    let registerBtn = document.getElementById("Register");
+
+    if (loginBtn) {
+        loginBtn.addEventListener("click", function (e) {
+            e.preventDefault(); // مهم علشان ميفضلش يـ reload الصفحة
+            setTimeout(() => {
+                window.location = "login.html";
+            }, 100);
+        });
+    }
+
+    if (registerBtn) {
+        registerBtn.addEventListener("click", function (e) {
+            e.preventDefault();
+            setTimeout(() => {
+                window.location = "register.html";
+            }, 100);
+        });
+    }
+
+    // show username + logout
     let userInfo = document.querySelector("#user_info");
     let userD = document.querySelector("#user");
     let links = document.querySelector("#links");

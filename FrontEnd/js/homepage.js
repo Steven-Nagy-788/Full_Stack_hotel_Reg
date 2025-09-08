@@ -1,5 +1,3 @@
-let check_btn = document.getElementById("check_btn");
-
 async function searchHotels() {
     const checkIn = document.getElementById('in').value;
     const checkOut = document.getElementById('out').value;
