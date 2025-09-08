@@ -19,6 +19,12 @@ let inventoryData = [
   {id:1,hotelId:1,roomId:1,fromDate:"2025-09-10",toDate:"2025-09-20",available:5},
   {id:2,hotelId:2,roomId:2,fromDate:"2025-09-15",toDate:"2025-09-25",available:2}
 ];
+let usersData = [
+  {id:1, name:"Admin", email:"admin@test.com", role:1, password:"admin123"},
+  {id:2, name:"Ahmed", email:"ahmed@test.com", role:0, password:"ahmed123"},
+  {id:3, name:"Sara", email:"sara@test.com", role:0, password:"sara123"}
+];
+
 
 
 // Helpers
@@ -210,6 +216,81 @@ function renderBookings(){
       </table>
     </div>`
 }
+function renderUsers(){
+  return `<h2><i class="fa-solid fa-users"></i> Users</h2>
+    <button class="btn btn-primary mb-2" onclick="openUserForm()"><i class="fa-solid fa-plus"></i> Add User</button>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${usersData.map(u=>`
+            <tr>
+              <td>${u.id}</td>
+              <td>${u.name}</td>
+              <td>${u.email}</td>
+              <td>${u.role==1?"Admin":"User"}</td>
+              <td>
+                <button class="btn btn-warning btn-sm" onclick="openUserForm(${u.id})"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id})"><i class="fa-solid fa-trash"></i></button>
+              </td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>`
+}
+
+
+function openUserForm(id=""){
+  let u = id ? usersData.find(u=>u.id==id) : {name:"",email:"",role:0,password:""};
+  document.getElementById("modalTitle").innerText = id ? "Edit User" : "Add User";
+  document.getElementById("modalBody").innerHTML = `
+    <input type="hidden" id="userId" value="${id}">
+    <div class="mb-3"><label>Name</label><input class="form-control" id="userName" value="${u.name}"></div>
+    <div class="mb-3"><label>Email</label><input type="email" class="form-control" id="userEmail" value="${u.email}"></div>
+    <div class="mb-3"><label>Password</label><input type="password" class="form-control" id="userPassword" value="${u.password}"></div>
+    <div class="mb-3"><label>Role</label>
+      <select class="form-control" id="userRole">
+        <option value="0" ${u.role==0?"selected":""}>User</option>
+        <option value="1" ${u.role==1?"selected":""}>Admin</option>
+      </select>
+    </div>`;
+  document.getElementById("modalSave").onclick = saveUser;
+  new bootstrap.Modal(document.getElementById("mainModal")).show();
+}
+
+
+function saveUser(){
+  let id = document.getElementById("userId").value;
+  let name = document.getElementById("userName").value;
+  let email = document.getElementById("userEmail").value;
+  let password = document.getElementById("userPassword").value;
+  let role = parseInt(document.getElementById("userRole").value);
+
+  if(id){
+    let u = usersData.find(u=>u.id==id);
+    u.name = name; 
+    u.email = email; 
+    u.password = password; 
+    u.role = role;
+  } else {
+    usersData.push({id: usersData.length+1, name, email, role, password});
+  }
+
+  bootstrap.Modal.getInstance(document.getElementById("mainModal")).hide();
+  loadPage("users");
+}
+
+
+function deleteUser(id){
+  usersData = usersData.filter(u=>u.id!=id);
+  loadPage("users");
+}
+
 
 
 function confirmBooking(id){let b=bookingsData.find(b=>b.id==id);b.status="Confirmed";loadPage("dashboard");}
@@ -223,4 +304,6 @@ function loadPage(page){
   else if(page==="rooms") content.innerHTML=renderRooms();
   else if(page==="inventory") content.innerHTML=renderInventory();
   else if(page==="bookings") content.innerHTML=renderBookings();
+  else if(page==="users") content.innerHTML=renderUsers();
+
 }
