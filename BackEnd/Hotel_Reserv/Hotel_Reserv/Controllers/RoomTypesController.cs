@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Hotel_Reserv.Data;
 using Hotel_Reserv.Models;
 using Hotel_Reserv.Services;
+using Hotel_Reserv.Models.Dtos.RoomtypeDto;
 
 namespace Hotel_Reserv.Controllers;
 
@@ -29,7 +30,11 @@ public class RoomTypesController(IRoomTypeService roomTypeService) : ControllerB
     }
 
     [HttpPost]
+<<<<<<< Updated upstream
     public async ValueTask<IResult> PostRoomType(RoomType roomType) => await roomTypeService.CreateRoomType(roomType);
+=======
+    public async ValueTask<IResult> PostRoomType(RoomTypeDto roomType) => await roomTypeService.CreateRoomType(roomType);
+>>>>>>> Stashed changes
 
     // DELETE: api/RoomTypes/5
     [HttpDelete("{id}")]

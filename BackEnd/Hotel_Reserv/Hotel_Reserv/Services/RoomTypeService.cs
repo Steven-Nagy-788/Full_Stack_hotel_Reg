@@ -1,5 +1,10 @@
 using Hotel_Reserv.Data;
 using Hotel_Reserv.Models;
+<<<<<<< Updated upstream
+=======
+using Hotel_Reserv.Models.Dtos;
+using Hotel_Reserv.Models.Dtos.RoomtypeDto;
+>>>>>>> Stashed changes
 using Microsoft.EntityFrameworkCore;
 
 namespace Hotel_Reserv.Services;
@@ -16,7 +21,11 @@ public class RoomTypeService(ApplicationDbContext db) : IRoomTypeService
         return Results.Ok(await db.RoomTypes.Where(b => b.Id == id).FirstOrDefaultAsync());
     }
 
+<<<<<<< Updated upstream
     public async ValueTask<IResult> CreateRoomType(RoomType roomType)
+=======
+    public async ValueTask<IResult> CreateRoomType(RoomTypeDto roomTypeDto)
+>>>>>>> Stashed changes
     {
         await db.RoomTypes.AddAsync(roomType);
         await db.SaveChangesAsync();
