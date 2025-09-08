@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Hotel_Reserv.Data;
 using Hotel_Reserv.Models;
+using Hotel_Reserv.Models.Dtos;
 using Hotel_Reserv.Services;
 
 namespace Hotel_Reserv.Controllers;
@@ -29,7 +30,7 @@ public class RoomTypesController(IRoomTypeService roomTypeService) : ControllerB
     }
 
     [HttpPost]
-    public async ValueTask<IResult> PostRoomType(RoomType roomType) => await roomTypeService.CreateRoomType(roomType);
+    public async ValueTask<IResult> PostRoomType(RoomTypeDTO roomType) => await roomTypeService.CreateRoomType(roomType);
 
     // DELETE: api/RoomTypes/5
     [HttpDelete("{id}")]

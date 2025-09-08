@@ -1,5 +1,6 @@
 using Hotel_Reserv.Data;
 using Hotel_Reserv.Models;
+using Hotel_Reserv.Models.Dtos;
 using Microsoft.EntityFrameworkCore;
 
 namespace Hotel_Reserv.Services;
@@ -16,8 +17,18 @@ public class RoomTypeService(ApplicationDbContext db) : IRoomTypeService
         return Results.Ok(await db.RoomTypes.Where(b => b.Id == id).FirstOrDefaultAsync());
     }
 
-    public async ValueTask<IResult> CreateRoomType(RoomType roomType)
+    public async ValueTask<IResult> CreateRoomType(RoomTypeDTO roomTypeDto)
     {
+        var roomType = new RoomType()
+        {
+            
+            Name =  roomTypeDto.Name,
+            Capacity =  roomTypeDto.Capacity,
+            Bed_type = roomTypeDto.Bed_type,
+            Base_Price = roomTypeDto.Base_Price,
+            Description =  roomTypeDto.Description,
+            HotelId = roomTypeDto.HotelId
+        };
         await db.RoomTypes.AddAsync(roomType);
         await db.SaveChangesAsync();
         return Results.Created($"/api/RoomTypes/{roomType.Id}", roomType);

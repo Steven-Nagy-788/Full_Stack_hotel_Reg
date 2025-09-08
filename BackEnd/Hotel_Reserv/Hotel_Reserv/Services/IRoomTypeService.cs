@@ -6,7 +6,7 @@ public interface IRoomTypeService
 {
     ValueTask<IResult> GetRoomTypes();
     ValueTask<IResult> GetRoomType(int id);
-    ValueTask<IResult> CreateRoomType(RoomType roomType);
+    ValueTask<IResult> CreateRoomType(RoomTypeDTO roomType);
     ValueTask<IResult> UpdateRoomType(int id, RoomType roomType);
     ValueTask<IResult> DeleteRoomType(int id);
 }
