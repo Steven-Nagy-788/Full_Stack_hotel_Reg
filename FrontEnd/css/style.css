@@ -101,8 +101,6 @@ html {
 }
 
 
-/* الزر على اليمين */
-
 .navbar-toggler-icon i {
     font-size: 24px;
     color: #000;
@@ -133,26 +131,55 @@ margin-left: 20px;
     background-color: rgb(0, 140, 210);
 }
 
-/* ================== Fixedpage Section ================== */
+/* ================== form_title ================== */
 
-.Homepage-section {
-    position: relative;
-    width: 100%;
-    min-height: 100vh;
-    background: url("../img/beautiful-luxury-swimming-pool.jpg") no-repeat center center;
-    background-size: cover;
+#form_title {
+    width: 140px;
+    font-size: 19.7px;
+    font-weight: 500;
+    color: rgb(0, 169, 241);
+    text-transform: uppercase;
+    font-family: "Oswald", sans-serif;
+    text-decoration: none;
 }
 
-.Homepage-section::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.4);
+/* ================== Media Queries ================== */
+
+@media (max-width: 992px) {
+    .header .navbar {
+        flex-direction: row;
+        align-items: center;
+    }
+    .navbar-collapse {
+        width: 100%;
+        background-color: #fff;
+    }
+    .navigation ul {
+        flex-direction: column;
+        width: 100%;
+        padding-left: 0;
+    }
+    .nav-item {
+        width: 100%;
+        text-align: center;
+        margin: 0;
+    }
 }
 
+@media (max-width: 768px) {
+    .home_title h1 {
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 480px) {
+    .home_title h1 {
+        font-size: 20px;
+    }
+}
+
+
+/* ======================section-form(for regiser and login page)======================== */
 .section-form {
     position: absolute;
     top: 50%;
@@ -208,89 +235,6 @@ input {
     opacity: .5;
 }
 
-/*.Homepage-section {
-    position: relative;
-    width: 100%;
-    min-height: 100vh;
-    background: url("../img/beautiful-luxury-swimming-pool.jpg") no-repeat center center;
-    background-size: cover;
-}
-
-.Homepage-section::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.4);
-    
-}*/
-
-#form_title {
-    width: 140px;
-    font-size: 19.7px;
-    font-weight: 500;
-    color: rgb(0, 169, 241);
-    text-transform: uppercase;
-    font-family: "Oswald", sans-serif;
-    text-decoration: none;
-}
-
-
-/* ================== Home Title ================== */
-
-.home_title {
-    position: relative;
-    text-align: center;
-    margin-top: 120px;
-    z-index: 10;
-}
-
-.home_title h1 {
-    font-size: 40px;
-    color: #fff;
-    line-height: 1.2;
-}
-
-
-/* ================== Media Queries ================== */
-
-@media (max-width: 992px) {
-    .header .navbar {
-        flex-direction: row;
-        align-items: center;
-    }
-    .navbar-collapse {
-        width: 100%;
-        background-color: #fff;
-    }
-    .navigation ul {
-        flex-direction: column;
-        width: 100%;
-        padding-left: 0;
-    }
-    .nav-item {
-        width: 100%;
-        text-align: center;
-        margin: 0;
-    }
-}
-
-@media (max-width: 768px) {
-    .home_title h1 {
-        font-size: 28px;
-    }
-}
-
-@media (max-width: 480px) {
-    .home_title h1 {
-        font-size: 20px;
-    }
-}
-
-
-/* ======================home-section(Booking-form)======================== */
 
 .home-section {
     position: relative;
