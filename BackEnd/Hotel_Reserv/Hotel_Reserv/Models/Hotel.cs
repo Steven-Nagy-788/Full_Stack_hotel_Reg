@@ -13,7 +13,7 @@ public class Hotel
     public DateTime Created_At { get; set; } = DateTime.UtcNow;
     public int CreatedById { get; set; }
     [JsonIgnore]
-    public User user { get; set; } = null!;
+    public User? Admin_Id { get; set; }
     [JsonIgnore]
     public ICollection<RoomType> RoomTypes { get; set; } = new List<RoomType>();
     public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
