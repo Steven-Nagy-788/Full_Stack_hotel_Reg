@@ -108,23 +108,12 @@ html {
     color: #000;
 }
 
-<<<<<<< Updated upstream
+
 .startbuttons {
 display: flex;
 justify-content: right;
 align-items: center;
 margin-left: 20px;
-=======
-
-/* ================== Homepage Section ================== */
-
-.Homepage-section {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    background: url("/img/beautiful-luxury-swimming-pool.jpg") no-repeat center center;
-    background-size: cover;
->>>>>>> Stashed changes
 }
 
 .startbuttons .Login,
@@ -203,16 +192,8 @@ input {
     opacity: .5;
 }
 
-<<<<<<< Updated upstream
-=======
-.Homepage-section {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    background: url("/img/beautiful-luxury-swimming-pool.jpg") no-repeat center center;
-    background-size: cover;
-}
->>>>>>> Stashed changes
+
+
 
 
 #form_title {
