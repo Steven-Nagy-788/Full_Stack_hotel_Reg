@@ -1,29 +1,36 @@
-// homepage.js — save booking choices and go to confirm page
 document.addEventListener('DOMContentLoaded', function () {
-  const bookingForm = document.querySelector('.form'); // your booking form
-  if (!bookingForm) return;
+  // Try to get booking data from localStorage
+  const storedData = localStorage.getItem('bookingData');
+  if (!storedData) {
+    alert("No booking data found. Please start again.");
+    window.location.href = "homepage.html"; // send back if missing
+    return;
+  }
 
-  bookingForm.addEventListener('submit', function (e) {
-    e.preventDefault(); // stop the form from reloading the page
+  const bookingData = JSON.parse(storedData);
 
-    const checkIn = document.getElementById('in') ? document.getElementById('in').value : '';
-    const checkOut = document.getElementById('out') ? document.getElementById('out').value : '';
-    const guests = document.getElementById('Guests') ? document.getElementById('Guests').value : '';
-    const rooms = document.getElementById('rooms') ? document.getElementById('rooms').value : '';
-    const city = document.getElementById('city') ? document.getElementById('city').value : '';
+  // Pre-fill the form fields
+  if (bookingData.fullName) document.getElementById("fullName").value = bookingData.fullName;
+  if (bookingData.email) document.getElementById("email").value = bookingData.email;
+  if (bookingData.phone) document.getElementById("phone").value = bookingData.phone;
 
-    // Save all homepage booking data in one object
-    const bookingData = {
-      checkIn,
-      checkOut,
-      guests,
-      rooms,
-      city
-    };
+  if (bookingData.checkIn) document.getElementById("checkin").value = bookingData.checkIn;
+  if (bookingData.checkOut) document.getElementById("checkout").value = bookingData.checkOut;
+  if (bookingData.guests) document.getElementById("guests").value = bookingData.guests;
+  if (bookingData.rooms) document.getElementById("rooms").value = bookingData.rooms;
 
-    localStorage.setItem('bookingData', JSON.stringify(bookingData));
+  // Just in case you also want city displayed later
+  if (bookingData.city) {
+    console.log("Selected city:", bookingData.city);
+  }
 
-    // Go to the confirmation page
-    window.location.href = 'confirm.html';
+  // Handle confirm submit
+  document.getElementById("confirmForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    alert("Booking confirmed! (Next: send to backend)");
+    
+    // Optional: clear storage so old data doesn’t stick
+    localStorage.removeItem('bookingData');
   });
 });
+
