@@ -108,32 +108,12 @@ html {
     color: #000;
 }
 
-
-
-
-
 .startbuttons {
 display: flex;
 justify-content: right;
 align-items: center;
 margin-left: 20px;
 }
-
-
-
-
-
-/* ================== Homepage Section ================== */
-
-.Homepage-section {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    background: url("/img/beautiful-luxury-swimming-pool.jpg") no-repeat center center;
-    background-size: cover;
-
-}
-
 
 .startbuttons .Login,
 .startbuttons .Register{
@@ -154,6 +134,24 @@ margin-left: 20px;
 }
 
 /* ================== Fixedpage Section ================== */
+
+.Homepage-section {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background: url("../img/beautiful-luxury-swimming-pool.jpg") no-repeat center center;
+    background-size: cover;
+}
+
+.Homepage-section::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+}
 
 .section-form {
     position: absolute;
@@ -210,7 +208,24 @@ input {
     opacity: .5;
 }
 
+/*.Homepage-section {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background: url("../img/beautiful-luxury-swimming-pool.jpg") no-repeat center center;
+    background-size: cover;
+}
 
+.Homepage-section::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    
+}*/
 
 #form_title {
     width: 140px;
@@ -220,10 +235,6 @@ input {
     text-transform: uppercase;
     font-family: "Oswald", sans-serif;
     text-decoration: none;
-}
-
-h1, .title {
-    font-size: clamp(20px, 4vw, 40px);
 }
 
 
@@ -279,7 +290,7 @@ h1, .title {
 }
 
 
-/* ======================home-section(Search-form)======================== */
+/* ======================home-section(Booking-form)======================== */
 
 .home-section {
     position: relative;
@@ -336,7 +347,7 @@ h1, .title {
 .home-section .itm2 .line {
     display: flex;
     align-items: center;  
-    margin-bottom: 15px;  
+    margin-bottom: 15px;  /* مسافة بين كل خط */
 }
 
 /* Labels */
@@ -378,16 +389,16 @@ h1, .title {
     .home-section {
         display: flex;
         flex-direction: column;
-        justify-content: center; 
-        align-items: center;     
+        justify-content: center; /* يوسطن عمودي */
+        align-items: center;     /* يوسطن أفقي */
         text-align: center;
-        min-height: 100vh;       
-        padding-top: 60px;       
+        min-height: 100vh;       /* مهم علشان يوسطن */
+        padding-top: 60px;       /* علشان يبعد عن الـ navbar الثابت */
         box-sizing: border-box;
     }
 
     .home-section .content {
-        position: static;   
+        position: static;   /* بلاش absolute */
         transform: none;
         margin: 0;
         padding: 20px;
@@ -400,7 +411,7 @@ h1, .title {
         width: 100%;
         max-width: 400px;
         margin: 0 auto; 
-        z-index: 500;
+          z-index: 500;
     }
 
 
@@ -430,93 +441,6 @@ h1, .title {
     .home-section .home-title {
         font-size: 1.8rem;
     }
-}
-
-/* ===== Booking confirm specific styles (add to css/style.css) ===== */
-.home-section {
-    position: relative;
-    width: 100%;
-    min-height: 100vh;
-    background: url("../img/beautiful-luxury-swimming-pool.jpeg") no-repeat center center;
-    background-size: cover;
-}
-.home-section::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 1;
-}
-.home-section .container { position: relative; z-index: 2; }
-
-/* Right-side confirmation form */
-.home-section .itm2 {
-    position: absolute;
-    top: 55%;
-    left: 75%;
-    transform: translate(-50%, -50%);
-    color: #000;
-    width: 400px;
-    max-width: 90%;
-}
-
-/* Box look */
-.item .box {
-    padding: 24px;
-    background-color: #fff;
-    color: rgb(0, 169, 241);
-    border: 3px solid rgb(0, 169, 241);
-    border-radius: 14px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-}
-
-/* Lines & fields */
-.home-section .itm2 .line {
-    display: flex;
-    align-items: center;
-    margin-bottom: 12px;
-}
-.home-section .itm2 .line label {
-    width: 110px;
-    margin-right: 10px;
-    color: #333;
-    font-weight: 600;
-    font-size: 14px;
-}
-.home-section .itm2 .line input,
-.home-section .itm2 .line select {
-    flex: 1;
-    padding: 8px 10px;
-    border: 2px solid rgb(0, 169, 241);
-    border-radius: 8px;
-    font-size: 14px;
-}
-
-/* Button */
-.home-section .itm2 .btn {
-    width: 100%;
-    padding: 12px 0;
-    background-color: rgb(0, 169, 241);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-}
-.home-section .itm2 .btn:hover {
-    background-color: rgb(0, 140, 210);
-}
-
-/* Responsive: put form under content on smaller screens */
-@media (max-width: 992px) {
-    .home-section .itm2 {
-        position: static;
-        transform: none;
-        margin: 20px auto;
-        left: auto;
-        top: auto;
-    }
-    .item .content { text-align: center; margin-bottom: 18px; }
 }
 
 
@@ -609,88 +533,3 @@ h1, .title {
     font-size: 13px;
     color: #aaa;
 }
-
-/* =========================Hotel-Details========================== */
-
-/* Container */
-.hotel-details {
-  margin-top: 120px;
-  padding: 20px;
-}
-
-/* Header info */
-.hotel-header {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 20px;
-}
-
-.hotel-img {
-  width: 100%;
-  max-width: 400px;
-  border-radius: 10px;
-  object-fit: cover;
-}
-
-.hotel-text {
-  flex: 1;
-}
-
-.hotel-text h2 {
-  font-size: 28px;
-  color: rgb(0, 169, 241);
-}
-
-.hotel-text p.city {
-  font-weight: bold;
-  color: #444;
-}
-
-/* Room cards */
-.rooms-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.room-card {
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 15px;
-  text-align: center;
-  background: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.room-card h4 {
-  color: #333;
-  margin-bottom: 10px;
-}
-
-.room-card p {
-  margin: 0 0 15px;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .hotel-header {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .hotel-img {
-    max-width: 100%;
-  }
-}
-
-/* Footer */
-.footer {
-  margin-top: 40px;
-  padding: 20px;
-  background: #111;
-  color: #eee;
-}
-

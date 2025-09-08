@@ -14,6 +14,7 @@ public class RoomType
     public Hotel Hotel { get; set; } = null!;
     [JsonIgnore]
     public ICollection<RoomInventory> RoomInventories { get; set; } = new List<RoomInventory>();
+    [JsonIgnore]
     public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
 
