@@ -1,14 +1,22 @@
-﻿namespace Hotel_Reserv.Models;
-public record HotelDto(string Name, string City, string Address, string Description, int Stars, string Thumbnail_url);
+﻿using System.Text.Json.Serialization;
+
+namespace Hotel_Reserv.Models;
 public class Hotel
 {
     public int Id { get; set; }
-    public string? Name { get; set; }
-    public string? City { get; set; }
-    public string? Address { get; set; }
-    public string? Description { get; set; }
-    public int Stars { get; set; }
-    public string? Thumbnail_url { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string City { get; set; } = string.Empty;
+    public string Address { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public int Stars { get; set; }  
+    public string Thumbnail_url { get; set; } = string.Empty;
     public DateTime Created_At { get; set; } = DateTime.UtcNow;
-    public virtual ICollection<RoomType>? RoomTypes { get; set; }
+    public int CreatedById { get; set; }
+    [JsonIgnore]
+    public User user { get; set; } = null!;
+    [JsonIgnore]
+    public ICollection<RoomType> RoomTypes { get; set; } = new List<RoomType>();
+    public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+    public ICollection<Review> Reviews { get; set; } = new List<Review>();
+
 }

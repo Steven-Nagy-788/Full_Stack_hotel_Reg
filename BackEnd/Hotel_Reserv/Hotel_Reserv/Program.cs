@@ -1,18 +1,36 @@
 ﻿using Hotel_Reserv.Data;
-using Scalar.AspNetCore;
-using Microsoft.AspNetCore.Identity;
 using Hotel_Reserv.Models;
+using Hotel_Reserv.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
+using System.Text;
 //using Hotel_Reserv.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
-});
+builder.Services.AddControllers();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["AppSettings:Issuer"], 
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["AppSettings:Audience"],
+            ValidateLifetime = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"]!)
+            ),
+            ValidateIssuerSigningKey = true
+        };
+    });
+builder.Services.AddAuthorization();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
@@ -23,7 +41,8 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 app.UseHttpsRedirection();
-app.UseRouting();
+//app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapStaticAssets();
 app.MapControllers();

@@ -66,17 +66,8 @@ namespace Hotel_Reserv.Controllers
             return NoContent();
         }
         [HttpPost]
-        public async ValueTask<IResult> PostHotel(HotelDto hotelDto)
+        public async ValueTask<IResult> PostHotel(Hotel hotel)
         {
-            var hotel = new Hotel
-            {
-                Name = hotelDto.Name,
-                City = hotelDto.City,
-                Address = hotelDto.Address,
-                Description = hotelDto.Description,
-                Stars = hotelDto.Stars,
-                Thumbnail_url = hotelDto.Thumbnail_url
-            };
             await _context.Hotels.AddAsync(hotel);
             await _context.SaveChangesAsync();
             return Results.Created($"api/Hotels/{hotel.Id}", hotel);

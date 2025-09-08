@@ -1,18 +1,15 @@
 ﻿namespace Hotel_Reserv.Models;
-public enum UserRole
-{
-    Admin,
-    Guest
-}
-public record UserRegDto(string Name, string Email, string Password_Hash, UserRole Role);
-public record UserLoginDto (string Email , string Password_Hash);
+
 public class User
 {
     public int Id { get; set; }
-    public string? Name { get; set; }
-    public string? Email { get; set; }
-    public string? Password_Hash { get; set; }
-    public UserRole? Role { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Password_Hash { get; set; } = string.Empty;
+    public string Role { get; set; } = "guest";
     public DateTime Created_At { get; init; } = DateTime.UtcNow;
-    public virtual ICollection<Booking>? Bookings { get; set; }
+    public ICollection<Hotel> Hotels { get; set; }=new List<Hotel>();
+    public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+    public ICollection<Review> Reviews { get; set; } = new List<Review>();
+
 }

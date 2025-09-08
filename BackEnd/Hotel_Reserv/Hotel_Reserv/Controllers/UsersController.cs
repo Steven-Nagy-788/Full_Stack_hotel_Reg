@@ -1,7 +1,6 @@
-﻿
-using Azure.Core;
-using Hotel_Reserv.Data;
+﻿using Hotel_Reserv.Data;
 using Hotel_Reserv.Models;
+using Hotel_Reserv.Models.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -22,30 +21,29 @@ namespace Hotel_Reserv.Controllers
         }
 
         [HttpPost("register")]
-        public async ValueTask<IResult> PostUser(UserRegDto userDto)
+        public async ValueTask<IResult> PostUser(UserDtoReg userDto)
         {
             var userExists = await _context.Users.AnyAsync(u => u.Email == userDto.Email);
             if (userExists)
                 return Results.Conflict();
             var user = new User
             {
-                Name = userDto.Name,
-                Email = userDto.Email,
-                Role = userDto.Role
+                Name = userDto.UserName,
+                Email = userDto.Email
             };
-            user.Password_Hash = _passwordHasher.HashPassword(user, userDto.Password_Hash);
+            user.Password_Hash = _passwordHasher.HashPassword(user, userDto.PassWord);
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
             return Results.Created($"/api/users/{user.Id}", user);
         }
 
         [HttpPost("login")]
-        public async ValueTask<IResult> LoginUser(UserLoginDto userLoginDto)
+        public async ValueTask<IResult> LoginUser(UserDtoLog userLoginDto)
         {
             var userExists = await _context.Users.FirstOrDefaultAsync(u => u.Email == userLoginDto.Email);
             if (userExists is null)
                 return Results.Unauthorized();
-            var correctPassword =_passwordHasher.VerifyHashedPassword(userExists, userExists.Password_Hash!, userLoginDto.Password_Hash) == PasswordVerificationResult.Success;
+            var correctPassword =_passwordHasher.VerifyHashedPassword(userExists, userExists.Password_Hash!, userLoginDto.PassWord) == PasswordVerificationResult.Success;
             if (!correctPassword)
                 return Results.Unauthorized();
             return Results.Ok(userExists);
