@@ -31,6 +31,7 @@ namespace Hotel_Reserv.Services
                 Address = h.Address,
                 Description = h.Description,
                 Stars = h.Stars,
+                Thumbnail_url = h.Thumbnail_url,
                 RoomTypes = h.RoomTypes?.Select(rt => new RoomTypeDTO
                 {
                     Name = rt.Name,
@@ -45,6 +46,41 @@ namespace Hotel_Reserv.Services
             });
 
             }
+
+        public async Task<IEnumerable<HotelDto>> SearchAvailableHotelsAsync(
+    string city,
+    DateTime checkIn,
+    DateTime checkOut,
+    int numberOfClients,
+    int numberOfRooms)
+        {
+            var hotels = await _db.Hotels
+                .Include(h => h.RoomTypes)
+                    .ThenInclude(rt => rt.RoomInventories)
+                .Where(h => h.City == city)
+                .ToListAsync();
+
+            var availableHotels = hotels
+                .Where(h => h.RoomTypes.Any(rt =>
+                    rt.Capacity >= numberOfClients &&  // Room must fit clients
+                    rt.RoomInventories
+                        .Where(inv => inv.Date >= checkIn && inv.Date < checkOut)
+                        .All(inv => inv.AvailableRooms >= numberOfRooms) // Every date must have enough rooms
+                ))
+                .ToList();
+
+            return  availableHotels.Select(h => new HotelDto
+            {
+                Id = h.Id,
+                Name = h.Name,
+                City = h.City,
+                Address = h.Address,
+                Description = h.Description,
+                Stars = h.Stars
+                // add other properties you need in the DTO
+            }).ToList();
+        }
+        
 
         public async Task<HotelDto?> GetHotelByIdAsync(int id)
         {
@@ -61,6 +97,7 @@ namespace Hotel_Reserv.Services
                 Address = hotel.Address,
                 Description = hotel.Description,
                 Stars = hotel.Stars,
+                Thumbnail_url= hotel.Thumbnail_url,
                 RoomTypes = hotel.RoomTypes?.Select(rt => new RoomTypeDTO
                 {
                     Name = rt.Name,
@@ -88,6 +125,7 @@ namespace Hotel_Reserv.Services
                 Address = dto.Address,
                 Description = dto.Description,
                 Stars = dto.Stars,
+                Thumbnail_url = dto.Thumbnail_url,
                 CreatedById = userId
             };
 
@@ -102,6 +140,7 @@ namespace Hotel_Reserv.Services
                 Address = hotel.Address,
                 Description = hotel.Description,
                 Stars = hotel.Stars,
+                Thumbnail_url= hotel.Thumbnail_url,
                 RoomTypes = new List<RoomTypeDTO>()
             };
         }
@@ -116,7 +155,7 @@ namespace Hotel_Reserv.Services
             hotel.Address = dto.Address;
             hotel.Description = dto.Description;
             hotel.Stars = dto.Stars;
-
+            hotel.Thumbnail_url = dto.Thumbnail_url;
             await _db.SaveChangesAsync();
             return true;
         }
