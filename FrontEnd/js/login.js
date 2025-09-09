@@ -1,24 +1,9 @@
+// اختيار العناصر من الـ DOM
 let email = document.querySelector("#email");
 let password = document.querySelector("#password");
 let loginBtn = document.querySelector("#Login");
 
-
-function parseJwt(token) {
-    try {
-        let base64Url = token.split('.')[1];
-        let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        let jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
-        return JSON.parse(jsonPayload);
-    } catch (e) {
-        console.error("Invalid token", e);
-        return null;
-    }
-}
-
-// ✅ Login
-loginBtn.addEventListener("click", function (e) {
+loginBtn.addEventListener("click", function(e) {
     e.preventDefault();
 
     if (email.value === "" || password.value === "") {
@@ -26,73 +11,85 @@ loginBtn.addEventListener("click", function (e) {
         return;
     }
 
+    // تجهيز البيانات للإرسال للـ API
+    let loginData = {
+        email: email.value,
+        passWord: password.value
+    };
+
+    // إرسال بيانات login للـ API
     fetch('https://localhost:7033/api/Users/Login', {
-        method: "POST",
+        method: 'POST',
         headers: {
-            "Content-Type": "application/json"
+            'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            email: email.value,
-            passWord: password.value
-        })
+        body: JSON.stringify(loginData)
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error("Server returned " + response.status);
+            throw new Error("Invalid email or password");
         }
-        return response.text();   
+        return response.text(); // نفترض الـ API بيرجع Token كنص
     })
     .then(token => {
-        console.log("Raw token:", token);
+        console.log("JWT Token:", token);
 
+        // حفظ التوكن في localStorage لو عايزة تستخدمينه في صفحات تانية
         localStorage.setItem("token", token);
 
-        let decoded = parseJwt(token);
-        console.log("Decoded token:", decoded);
-
-        if (decoded && decoded.username) {
-            localStorage.setItem("firstname", decoded.username);
-        } else {
-            localStorage.setItem("firstname", "User");
+        // Decode للـ JWT علشان نجيب firstname
+        function parseJwt(token) {
+            try {
+                let base64Url = token.split('.')[1];
+                let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                let jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (err) {
+                console.error("Failed to parse token", err);
+                return {};
+            }
         }
 
-        localStorage.setItem("email", email.value);
+        let payload = parseJwt(token);
+        let firstname = payload.firstname || "User"; // حسب اسم الحقل في الـ backend
 
-     
-        if (decoded && decoded.role && decoded.role.toLowerCase() === "admin") {
-            window.location = "Admin/admin.html";
+        // عرض اسم المستخدم بجانب Hello
+        let userInfo = document.querySelector("#user_info");
+        let userD = document.querySelector("#user");
+        let links = document.querySelector("#links");
+
+        if (links) links.style.display = "none";     
+        if (userInfo) userInfo.style.display = "block";
+        if (userD) userD.innerHTML = "Hello, " + firstname;
+
+        // check if admin
+        if (email.value.toLowerCase() === "admin@admin.com" && password.value === "admin123") {
+            setTimeout(() => {
+                window.location = "Admin/admin.html";
+            }, 1000);
         } else {
-            window.location = "homepage.html";
+            setTimeout(() => {
+                const redirectPage = localStorage.getItem("redirectAfterLogin") || "homepage.html";
+                localStorage.removeItem("redirectAfterLogin");
+                window.location = redirectPage;
+            }, 1000);
         }
+
     })
     .catch(error => {
         console.error("Error:", error);
-        alert("Login failed ❌");
+        alert("Login failed. Invalid email or password.");
     });
 });
 
-
-// Hello + Logout
+// Logout functionality
 document.addEventListener("DOMContentLoaded", function () {
-    let userInfo = document.querySelector("#user_info");
-    let userD = document.querySelector("#user");
-    let links = document.querySelector("#links");
     let logout_btn = document.querySelector("#Logout");
-
-    if (localStorage.getItem("firstname")) {
-        if (links) links.style.display = "none";
-        if (userInfo) userInfo.style.display = "block";
-        if (userD) userD.innerHTML = "Hello, " + localStorage.getItem("firstname");
-    } else {
-        if (links) links.style.display = "flex";
-        if (userInfo) userInfo.style.display = "none";
-    }
 
     if (logout_btn) {
         logout_btn.addEventListener("click", function () {
-            localStorage.removeItem("firstname");
-            localStorage.removeItem("username");
-            localStorage.removeItem("email");
             localStorage.removeItem("token");
             window.location = "homepage.html";
         });

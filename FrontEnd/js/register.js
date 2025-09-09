@@ -1,58 +1,48 @@
-let firstname = document.querySelector("#firstName");  // This is the username input
-let email = document.querySelector("#email");          // This is the email input
-let password = document.querySelector("#password");    // This is the password input
-let register_btn = document.querySelector("#sign_up"); // This is the register button
+// اختيار العناصر من الـ DOM
+let firstname = document.querySelector("#firstName");
+let email = document.querySelector("#email");
+let password = document.querySelector("#password");
+let register_btn = document.querySelector("#sign_up");
 
-register_btn.addEventListener("click", function (e) {
-    e.preventDefault(); // Prevent the form from refreshing the page
+register_btn.addEventListener("click", function(e) {
+    e.preventDefault(); // منع إعادة تحميل الصفحة عند الضغط على submit
 
-    // Check if any input fields are empty
+    // التحقق من أن الحقول ليست فارغة
     if (firstname.value === "" || email.value === "" || password.value === "") {
-        alert("Please fill in all fields");
+        alert("Please fill all data");
         return;
     }
 
-    // Prepare the user data to send to the API
+    // تجهيز البيانات للإرسال للـ API
     let userData = {
         userName: firstname.value,
-        passWord: password.value,
-        email: email.value
+        email: email.value,
+        passWord: password.value
     };
 
-    // Send request to the API
+    // إرسال البيانات للـ API
     fetch('https://localhost:7033/api/Users/register', {
-        method: "POST", // The request type is POST
+        method: 'POST',
         headers: {
-            "Content-Type": "application/json" // Data format is JSON
+            'Content-Type': 'application/json'
         },
-        body: JSON.stringify(userData) // Convert data to JSON string
+        body: JSON.stringify(userData)
     })
     .then(response => {
-    console.log("Full response:", response); 
-    if (!response.ok) {
-        throw new Error("Server returned " + response.status);
-    }
-    return response.text();
-})
- // Convert the API response to JavaScript object
+        if (!response.ok) {
+            throw new Error("Failed to register user");
+        }
+        return response.text(); // بدل response.json() لأنه السيرفر بيرجع نص
+    })
     .then(data => {
-        alert("Account created successfully");
-
-        console.log("API response:", data); // Show the API response in console
-
-        // Save token or userId if available in response
-        if (data.token) {
-            localStorage.setItem("token", data.token);
-        }
-        if (data.userId) {
-            localStorage.setItem("userId", data.userId);
-        }
-
-        // Redirect to homepage after successful registration
-        window.location = "login.html";
+        console.log("Server response:", data); // optional: لتشوف الرد في الكونسل
+        alert("Account created Successfully");
+        setTimeout(() => {
+            window.location = "login.html"; // تحويل للـ homepage بعد 1 ثانية
+        }, 1000);
     })
     .catch(error => {
-        console.error("Error:", error); // Show any error in the console
-        alert("Registration failed ❌");
+        console.error("Error:", error);
+        alert("Registration failed. Please try again.");
     });
 });
