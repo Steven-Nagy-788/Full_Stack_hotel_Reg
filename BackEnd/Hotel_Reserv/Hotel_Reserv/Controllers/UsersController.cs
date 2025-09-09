@@ -15,7 +15,7 @@ namespace Hotel_Reserv.Controllers
     public class UsersController(IAuthService authservice) : ControllerBase
     {
         [HttpPost("register")]
-        public async ValueTask<ActionResult> PostUser(CreateUserDtoReg request)
+        public async ValueTask<ActionResult> PostUser(UserDtoReg request)
         {
             var user = await authservice.RegisterAsync(request);
             if (user is null) { return BadRequest("Email already exists"); }
@@ -43,7 +43,7 @@ namespace Hotel_Reserv.Controllers
 
         [HttpPost("create_User")]
         [Authorize(Roles = "Admin")]
-        public async ValueTask<ActionResult> CreateUser(CreateUserDtoReg obj)
+        public async ValueTask<ActionResult> CreateUser(CreateUserDto obj)
         {
             var user = await authservice.CreateUserAsync(obj);
             if (user is null) { return BadRequest("Email already exists"); }
@@ -54,7 +54,7 @@ namespace Hotel_Reserv.Controllers
 
         [HttpPut("UpdateUser_{id:int}")]
         [Authorize(Roles = "Admin")]
-        public async ValueTask<ActionResult> UpdateUser(int id, CreateUserDtoReg obj)
+        public async ValueTask<ActionResult> UpdateUser(int id, CreateUserDto obj)
         {
             var user= await authservice.UpdateUserAsync(id, obj);
             if (obj is null) { return BadRequest("INVALID OBJCT"); }

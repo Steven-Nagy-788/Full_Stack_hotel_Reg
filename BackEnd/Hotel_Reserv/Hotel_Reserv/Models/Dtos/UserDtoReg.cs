@@ -1,6 +1,6 @@
 ﻿namespace Hotel_Reserv.Models.Dtos
 {
-    public class CreateUserDtoReg
+    public class UserDtoReg
     {
         public string UserName { get; set; } = string.Empty;
         public string PassWord { get; set; } = string.Empty;
