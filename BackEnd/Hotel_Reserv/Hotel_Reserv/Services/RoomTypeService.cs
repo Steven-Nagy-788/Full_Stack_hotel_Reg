@@ -1,6 +1,7 @@
 using Hotel_Reserv.Data;
 using Hotel_Reserv.Models;
 using Hotel_Reserv.Models.Dtos;
+using Hotel_Reserv.Models.Dtos.RoomtypeDto;
 using Microsoft.EntityFrameworkCore;
 
 namespace Hotel_Reserv.Services;
@@ -14,8 +15,28 @@ public class RoomTypeService(ApplicationDbContext db) : IRoomTypeService
 
     public async ValueTask<IResult> GetRoomType(int id)
     {
-        return Results.Ok(await db.RoomTypes.Where(b => b.Id == id).FirstOrDefaultAsync());
+        var roomType = await db.RoomTypes
+            .Include(rt => rt.RoomInventories)
+            .FirstOrDefaultAsync(rt => rt.Id == id);
+
+        if (roomType == null)
+            return Results.NotFound();
+
+        var response = new RoomTypeResponseDTO
+        {
+            Id = roomType.Id,
+            Name = roomType.Name,
+            Capacity = roomType.Capacity,
+            Bed_type = roomType.Bed_type,
+            Base_Price = roomType.Base_Price,
+            Description = roomType.Description,
+            HotelId = roomType.HotelId,
+            AvailableRooms = roomType.RoomInventories.Sum(ri => ri.AvailableRooms)
+        };
+
+        return Results.Ok(response);
     }
+
 
     public async ValueTask<IResult> CreateRoomType(RoomTypeDTO roomTypeDto)
     {

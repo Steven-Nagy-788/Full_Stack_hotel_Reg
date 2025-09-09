@@ -407,3 +407,4 @@ BackEnd/Hotel_Reserv/Hotel_Reserv/packages-microsoft-prod.deb
 /BackEnd/Hotel_Reserv/Hotel_Reserv/Migrations
 BackEnd/Hotel_Reserv/Hotel_Reserv/Migrations/ApplicationDbContextModelSnapshot.cs
 BackEnd/Hotel_Reserv/Hotel_Reserv/Migrations/ApplicationDbContextModelSnapshot.cs
+BackEnd/Hotel_Reserv/Hotel_Reserv/appsettings.json

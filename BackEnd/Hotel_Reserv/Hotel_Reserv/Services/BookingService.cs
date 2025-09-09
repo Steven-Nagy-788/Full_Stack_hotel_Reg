@@ -7,12 +7,20 @@ namespace Hotel_Reserv.Services;
 
 public class BookingService(ApplicationDbContext db) : IBookingService
 {
+    //allbooking
     public async ValueTask<IResult> GetBookings() =>
         Results.Ok(await db.Bookings.ToListAsync());
+    
+    //
     public async ValueTask<IResult> GetBooking(int id) =>
         Results.Ok(await db.Bookings.Where(b => b.Id == id).FirstOrDefaultAsync());
+
+
+    //
     public async ValueTask<IResult> GetBookingsByUserId(int userId) =>
         Results.Ok(await db.Bookings.Where(b => b.User_Id == userId).ToListAsync());
+
+
 
     public async Task<bool> ValidateBookingDate(int hotelId, int roomId, DateOnly wantedDateToCheckIn, DateOnly wantedDateToCheckOut)
     {
@@ -32,7 +40,7 @@ public class BookingService(ApplicationDbContext db) : IBookingService
         // Return true if dates are available (no overlapping bookings found)
         return !hasOverlappingBookings;
     }
-    public async ValueTask<IResult> CreateBooking(BookingDTO bookingDto)
+    public async ValueTask<IResult> CreateBooking(BookingDTO bookingDto,int id)
     {
         // if (bookingDto.Check_In >= bookingDto.Check_Out)
         //     return Results.BadRequest("Check-out date must be after check-in date.");
@@ -44,7 +52,8 @@ public class BookingService(ApplicationDbContext db) : IBookingService
         // var hotel = await db.Hotels.Where(b => b.Id == bookingDto.Hotel_Id).FirstOrDefaultAsync();
         // if (hotel is null)
         //     return Results.BadRequest("Hotel not found.");
-        var unavailable = await ValidateBookingDate(bookingDto.Hotel_Id, bookingDto.RoomType_Id, bookingDto.Check_In, bookingDto.Check_Out);
+        var unavailable = await
+            ValidateBookingDate(bookingDto.Hotel_Id, bookingDto.RoomType_Id, bookingDto.Check_In, bookingDto.Check_Out);
         if (unavailable)
             return Results.Conflict();
         var roomType = await db.RoomTypes
@@ -54,7 +63,7 @@ public class BookingService(ApplicationDbContext db) : IBookingService
             return Results.BadRequest();
         var booking = new Booking
         {
-            User_Id = bookingDto.User_Id,
+            User_Id = id,
             Hotel_Id = bookingDto.Hotel_Id,
             RoomType_Id = bookingDto.RoomType_Id,
             Check_In = bookingDto.Check_In.ToDateTime(TimeOnly.MinValue),
