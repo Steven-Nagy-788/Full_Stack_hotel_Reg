@@ -37,6 +37,8 @@ loginBtn.addEventListener("click", function(e) {
         // حفظ التوكن في localStorage لو عايزة تستخدمينه في صفحات تانية
         localStorage.setItem("token", token);
 
+        
+
         // Decode للـ JWT علشان نجيب firstname
         function parseJwt(token) {
             try {
