@@ -47,6 +47,41 @@ namespace Hotel_Reserv.Services
 
             }
 
+        public async Task<IEnumerable<HotelDto>> SearchAvailableHotelsAsync(
+    string city,
+    DateTime checkIn,
+    DateTime checkOut,
+    int numberOfClients,
+    int numberOfRooms)
+        {
+            var hotels = await _db.Hotels
+                .Include(h => h.RoomTypes)
+                    .ThenInclude(rt => rt.RoomInventories)
+                .Where(h => h.City == city)
+                .ToListAsync();
+
+            var availableHotels = hotels
+                .Where(h => h.RoomTypes.Any(rt =>
+                    rt.Capacity >= numberOfClients &&  // Room must fit clients
+                    rt.RoomInventories
+                        .Where(inv => inv.Date >= checkIn && inv.Date < checkOut)
+                        .All(inv => inv.AvailableRooms >= numberOfRooms) // Every date must have enough rooms
+                ))
+                .ToList();
+
+            return  availableHotels.Select(h => new HotelDto
+            {
+                Id = h.Id,
+                Name = h.Name,
+                City = h.City,
+                Address = h.Address,
+                Description = h.Description,
+                Stars = h.Stars
+                // add other properties you need in the DTO
+            }).ToList();
+        }
+        
+
         public async Task<HotelDto?> GetHotelByIdAsync(int id)
         {
             var hotel = await _db.Hotels
