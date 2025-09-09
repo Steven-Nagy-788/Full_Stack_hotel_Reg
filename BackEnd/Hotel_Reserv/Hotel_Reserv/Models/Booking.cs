@@ -1,4 +1,6 @@
-﻿namespace Hotel_Reserv.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace Hotel_Reserv.Models;
 public enum BookingStatus
 {
     PENDING,
@@ -11,10 +13,13 @@ public class Booking
 {
     public int Id { get; set; }
     public int User_Id { get; set; }
+    [JsonIgnore]
     public User User { get; set; } = null!;
     public int Hotel_Id { get; set; }
+    [JsonIgnore]
     public Hotel Hotel { get; set; } = null!;
     public int RoomType_Id { get; set; }
+    [JsonIgnore]
     public RoomType RoomType { get; set; } = null!;
     public DateTime Check_In { get; set; }
     public DateTime Check_Out { get; set; }
