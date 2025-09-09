@@ -16,8 +16,6 @@ document.addEventListener("DOMContentLoaded", function () {
     form.addEventListener("submit", function (e) {
         e.preventDefault();
 
-        const username = document.getElementById("username").value.trim();
-        const email = document.getElementById("email").value.trim();
         const phone = document.getElementById("phone").value.trim();
         const checkIn = document.getElementById("checkin").value;
         const checkOut = document.getElementById("checkout").value;
@@ -25,15 +23,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const rooms = document.getElementById("rooms").value;
         const city = document.getElementById("city").value;
 
-        if (!username || !email || !phone || !checkIn || !checkOut) {
+        if (!phone || !checkIn || !checkOut) {
             alert("⚠️ Please fill in all required fields.");
             return;
         }
 
         // Save confirmed booking (optional)
         const confirmedBooking = {
-            username,
-            email,
             phone,
             checkIn,
             checkOut,
@@ -44,6 +40,6 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.setItem("confirmedBooking", JSON.stringify(confirmedBooking));
 
         // Simple confirmation
-        alert(`✅ Booking confirmed for ${username} in ${city}!`);
+        alert(`✅ Booking confirmed for}!`);
     });
   
