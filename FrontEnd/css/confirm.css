@@ -1,4 +1,4 @@
-/* =============================confirmPAGE================================== */
+/* ================== Global Styles ================== */
 * {
     padding: 0;
     margin: 0;
@@ -37,7 +37,6 @@ html {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
 }
 
 .logo-link {
@@ -58,11 +57,14 @@ html {
     font-family: "Poppins", sans-serif;
 }
 
-.navigation ul {
-    list-style: none;
+.header .navbar .navigation ul {
     display: flex;
     gap: 0.6rem;
-    flex-wrap: wrap;
+    margin-right: 20px; 
+}
+
+.header .navbar .navigation {
+    margin-left: auto;
 }
 
 .nav-link {
@@ -101,19 +103,16 @@ html {
     order: 2;
 }
 
-
-/* الزر على اليمين */
-
 .navbar-toggler-icon i {
     font-size: 24px;
     color: #000;
 }
 
 .startbuttons {
-display: flex;
-justify-content: right;
-align-items: center;
-margin-left: 20px;
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    margin-left: 20px;
 }
 
 .startbuttons .Login,
@@ -134,15 +133,41 @@ margin-left: 20px;
     background-color: rgb(0, 140, 210);
 }
 
-/* Background section */
+.page-section {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background: url("../img/beautiful-luxury-swimming-pool.jpg") no-repeat center center fixed;
+  background-size: cover;
+  padding-top: 100px; 
+}
+
+.page-section .overlay {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5); 
+  z-index: 1;
+}
+
+.bookings-container {
+  position: relative;
+  z-index: 2;
+}
+
+
+/* ================== Confirm Section ================== */
+
+/* ================== Confirm Section ================== */
+
 .confirm-section {
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   min-height: 100vh;
-  padding: 20px;
-  background: url("../img/beautiful-luxury-swimming-pool.jpg") center center / cover no-repeat;
+  padding: 50px 20px; /* added more top padding */
   position: relative;
+  background: url("../img/beautiful-luxury-swimming-pool.jpg") center center / cover no-repeat;
 }
 
 .confirm-section::after {
@@ -153,16 +178,15 @@ margin-left: 20px;
   z-index: 1;
 }
 
-/* Container */
 .confirm-container {
   position: relative;
   z-index: 2;
   display: flex;
   flex-direction: row;
-  gap: 25px;
+  gap: 15px; /* smaller gap between form and title */
   background: rgba(255, 255, 255, 0.9);
   border-radius: 14px;
-  padding: 20px 25px;
+  padding: 20px; /* smaller padding inside */
   max-width: 850px;
   width: 100%;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -174,66 +198,124 @@ margin-left: 20px;
   color: rgb(0, 169, 241);
   font-size: 22px;
   font-weight: 600;
-  margin-bottom: 15px;
+  margin-bottom: 10px; /* smaller margin below title */
 }
 
 /* Form */
 .confirm-form {
-  flex: 1.3;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px 18px;
+  gap: 8px 10px; /* smaller gaps inside form */
 }
 
 .confirm-form .form-group {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column; /* keep label above input */
 }
 
-.confirm-form label {
-  margin-bottom: 4px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #444;
-}
+.confirm-form .form-group label {
+    margin-bottom: 3px;      /* consistent spacing below label */
+    font-size: 13px;         /* slightly smaller for neatness */
+    font-weight: 500;
+    color: #444;
+    display: block;           /* ensures proper alignment */
+} 
 
-.confirm-form input,
-.confirm-form select {
-  padding: 7px 9px;
-  border: 1.5px solid rgb(0, 169, 241);
+.confirm-form .form-group input,
+.confirm-form .form-group select {
+  padding: 5px 8px; /* smaller padding inside input */
+  font-size: 13px;
   border-radius: 6px;
-  font-size: 14px;
+  border: 1.5px solid rgb(0, 169, 241);
 }
 
-/* Button */
+/* ================== Confirm Button Matching Home Page ================== */
+/* Confirm Button Matching Home Page EXACTLY */
 .confirm-btn {
-  grid-column: span 2;
-  padding: 10px;
-  background: rgb(0, 169, 241);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 15px;
-  cursor: pointer;
-  transition: 0.25s;
+    display: inline-block;          /* button shrinks around its text */
+    padding: 8px 18px;              /* compact padding, not oversized */
+    background-color: rgb(0, 169, 241);
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    border: none;
+    border-radius: 6px;             /* slightly rounded */
+    cursor: pointer;
+    transition: background-color 0.3s ease, filter 0.3s ease;
 }
 
 .confirm-btn:hover {
-  background: rgb(0, 140, 210);
+    background-color: rgba(0, 169, 241, 0.8); /* slightly lighter */
+    filter: brightness(1.15);                 /* whole button goes “whiter” */
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .confirm-container {
-    flex-direction: column;
-    padding: 15px;
-  }
+/* ================== Footer ================== */
+.footer {
+    background-color: #111;
+    color: #eee;
+    padding: 50px 20px 25px;
+    margin-top: 60px;
+    font-size: 15px;
+}
 
-  .confirm-form {
-    grid-template-columns: 1fr;
-  }
+.footer .footer-col {
+    margin-bottom: 30px;
+}
 
-  .confirm-btn {
-    grid-column: span 1;
-  }
+.footer h3,
+.footer h5 {
+    color: rgb(0, 169, 241);
+    margin-bottom: 18px;
+    font-weight: 600;
+}
+
+.footer p {
+    font-size: 14px;
+    line-height: 1.8;
+    margin-bottom: 0;
+}
+
+.footer ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer ul li {
+    margin-bottom: 10px;
+}
+
+.footer ul li a {
+    color: #eee;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer ul li a:hover {
+    color: rgb(0, 169, 241);
+}
+
+.footer .social-icons {
+    margin-top: 5px;
+}
+
+.footer .social-icons a {
+    display: inline-block;
+    margin-right: 12px;
+    color: #eee;
+    font-size: 20px;
+    transition: color 0.3s;
+}
+
+.footer .social-icons a:hover {
+    color: rgb(0, 169, 241);
+}
+
+.footer-bottom {
+    border-top: 1px solid #333;
+    text-align: center;
+    padding-top: 15px;
+    margin-top: 30px;
+    font-size: 13px;
+    color: #aaa;
 }
