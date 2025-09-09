@@ -14,7 +14,7 @@ namespace Hotel_Reserv.Services
 {
     public class AuthService(ApplicationDbContext db, IConfiguration config) : IAuthService
     {
-        public async ValueTask<User?> RegisterAsync(UserDtoReg request)
+        public async ValueTask<User?> RegisterAsync(CreateUserDtoReg request)
         {
             if (await db.Users.AnyAsync(u => u.Email == request.Email)) { return null; }
             var user = new User() { };
@@ -46,7 +46,7 @@ namespace Hotel_Reserv.Services
                            })
                            .ToListAsync();
         }
-        public async ValueTask<User?> CreateUserAsync(UserDtoReg request)
+        public async ValueTask<User?> CreateUserAsync(CreateUserDto request)
         {
             if (await db.Users.AnyAsync(u => u.Email == request.Email)) { return null; }
             var user = new User() { };
@@ -59,7 +59,7 @@ namespace Hotel_Reserv.Services
             await db.SaveChangesAsync();
             return user;
         }
-        public async ValueTask<User?> UpdateUserAsync(int id,UserDtoReg upd)
+        public async ValueTask<User?> UpdateUserAsync(int id,CreateUserDtoReg upd)
         {
             var user =await db.Users.FirstOrDefaultAsync(i => i.Id == id);
             if (user is null) { return null; }
