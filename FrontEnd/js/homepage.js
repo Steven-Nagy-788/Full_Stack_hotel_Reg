@@ -1,3 +1,29 @@
+function saveBookingData() {
+  const checkIn = document.getElementById("in").value;
+  const checkOut = document.getElementById("out").value;
+  const guests = document.getElementById("Guests").value;
+  const rooms = document.getElementById("rooms").value;
+  const city = document.getElementById("city").value;
+
+  const bookingData = {
+    checkIn,
+    checkOut,
+    guests,
+    rooms,
+    city
+  };
+
+
+  document.getElementById("check_btn").addEventListener("click", function(e) {
+  e.preventDefault(); // Prevent form submission
+  saveBookingData();
+  window.location.href = "confirm.html"; // Adjust confirm page file name if different
+});
+
+
+  localStorage.setItem("bookingData", JSON.stringify(bookingData));
+}
+
 async function searchHotels() {
     const checkIn = document.getElementById('in').value;
     const checkOut = document.getElementById('out').value;
