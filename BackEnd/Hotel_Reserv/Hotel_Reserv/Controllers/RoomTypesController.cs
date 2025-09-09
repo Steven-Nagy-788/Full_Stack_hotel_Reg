@@ -9,6 +9,7 @@ using Hotel_Reserv.Data;
 using Hotel_Reserv.Models;
 using Hotel_Reserv.Models.Dtos;
 using Hotel_Reserv.Services;
+using Hotel_Reserv.Models.Dtos.RoomtypeDto;
 
 namespace Hotel_Reserv.Controllers;
 
@@ -29,9 +30,8 @@ public class RoomTypesController(IRoomTypeService roomTypeService) : ControllerB
         return await roomTypeService.UpdateRoomType(id, roomType);
     }
 
-    [HttpPost]
-    public async ValueTask<IResult> PostRoomType(RoomTypeDTO roomType) => await roomTypeService.CreateRoomType(roomType);
 
+  
     // DELETE: api/RoomTypes/5
     [HttpDelete("{id}")]
     public async ValueTask<IResult> DeleteRoomType(int id)

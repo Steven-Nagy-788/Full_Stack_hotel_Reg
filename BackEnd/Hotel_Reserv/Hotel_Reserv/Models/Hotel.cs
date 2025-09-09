@@ -16,7 +16,9 @@ public class Hotel
     public User? Admin_Id { get; set; }
     [JsonIgnore]
     public ICollection<RoomType> RoomTypes { get; set; } = new List<RoomType>();
+    [JsonIgnore]
     public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+    [JsonIgnore]
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
 
 }
