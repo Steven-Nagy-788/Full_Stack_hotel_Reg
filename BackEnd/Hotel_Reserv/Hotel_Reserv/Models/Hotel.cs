@@ -3,17 +3,17 @@
 namespace Hotel_Reserv.Models;
 public class Hotel
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string City { get; set; } = string.Empty;
-    public string Address { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
+    public int Id { get; init; }
+    public string? Name { get; set; }
+    public string? City { get; set; }
+    public string? Address { get; set; }
+    public string? Description { get; set; }
     public int Stars { get; set; }  
-    public string Thumbnail_url { get; set; } = string.Empty;
-    public DateTime Created_At { get; set; } = DateTime.UtcNow;
+    public string? Thumbnail_url { get; set; }
+    public DateTime Created_At { get; init; } = DateTime.UtcNow;
     public int CreatedById { get; set; }
     [JsonIgnore]
-    public User? Admin_Id { get; set; }
+    public User? Admin { get; set; }
     [JsonIgnore]
     public ICollection<RoomType> RoomTypes { get; set; } = new List<RoomType>();
     [JsonIgnore]

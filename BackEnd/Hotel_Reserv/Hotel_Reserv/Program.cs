@@ -1,5 +1,8 @@
-﻿using Hotel_Reserv.Data;
+﻿using Azure.Core;
+using Hotel_Reserv.Data;
 using Hotel_Reserv.Models;
+using Hotel_Reserv.Models.Dtos;
+using Hotel_Reserv.Models.Enums;
 using Hotel_Reserv.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -61,5 +64,4 @@ app.UseAuthorization();
 app.MapStaticAssets();
 app.MapControllers();
 app.Map("/", () => Results.Redirect("/scalar/v1"));
-
 app.Run();

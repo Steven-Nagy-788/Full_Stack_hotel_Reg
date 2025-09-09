@@ -1,5 +1,4 @@
 ﻿using Hotel_Reserv.Models.Dtos;
-using Hotel_Reserv.Models.Dtos.HotelDto;
 using Hotel_Reserv.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,69 +10,46 @@ namespace Hotel_Reserv.Controllers
     [ApiController]
     public class HotelController : ControllerBase
     {
-        private readonly IHotelService _hotelService;
+        private readonly IHotelService hotelService;
 
-        public HotelController(IHotelService hotelService)
+        public HotelController(IHotelService HotelService)
         {
-            _hotelService = hotelService;
+            hotelService = HotelService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllHotels()
-        {
-            var hotels = await _hotelService.GetAllHotelsAsync();
-            if(hotels is null) { return BadRequest("no hotels found"); }
-            return Ok(hotels);
-        }
+        public async ValueTask<IResult> GetAllHotels() =>
+            await hotelService.GetAllHotelsAsync();
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetHotelById(int id)
-        {
-            var hotel = await _hotelService.GetHotelByIdAsync(id);
-            if (hotel is null) return NotFound();
-            return Ok(hotel);
-        }
+        public async ValueTask<IResult> GetHotelById(int id) =>
+            await hotelService.GetHotelByIdAsync(id);
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateHotel([FromBody] HotelDtoCreate dto)
+        public async ValueTask<IResult> CreateHotel([FromBody] HotelDtoCreate dto)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var hotel = await _hotelService.CreateHotelAsync(dto, userId);
-            if (hotel is null) { return Conflict("hotel already exits"); }
-            return Ok(hotel);
-        }
-
-        [HttpGet("search")]
-        public async Task<IActionResult> SearchHotels(
-                string city,
-                DateTime checkIn,
-                DateTime checkOut,
-                int numberOfClients,
-                int numberOfRooms)
-        {
-            var hotels = await _hotelService.SearchAvailableHotelsAsync(
-                city, checkIn, checkOut, numberOfClients, numberOfRooms);
-
-            return Ok(hotels);
+            return await hotelService.CreateHotelAsync(dto, userId);
         }
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateHotel(int id, [FromBody] HotelDtoCreate dto)
-        {
-            var updated = await _hotelService.UpdateHotelAsync(id, dto);
-            if (!updated) return NotFound("id not found");
-            return Ok(new { message = "Hotel updated successfully" });
-        }
-
+        public async ValueTask<IResult> UpdateHotel(int id, [FromBody] HotelDtoCreate dto) =>
+            await hotelService.UpdateHotelAsync(id, dto);
+         
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteHotel(int id)
-        {
-            var deleted = await _hotelService.DeleteHotelAsync(id);
-            if (!deleted) return NotFound("id not found");
-            return Ok(new { message = "Hotel deleted successfully" });
-        }
+        public async ValueTask<IResult> DeleteHotel(int id) =>
+            await hotelService.DeleteHotelAsync(id);
+
+        //[HttpGet("search")]
+        //public async Task<IResult> SearchHotels(
+        //        string city,
+        //        DateTime checkIn,
+        //        DateTime checkOut,
+        //        int numberOfClients,
+        //        int numberOfRooms)=> await hotelService.SearchAvailableHotelsAsync(city, checkIn, checkOut, numberOfClients, numberOfRooms);
+
     }
 }

@@ -10,6 +10,7 @@ public class User
     public string? Password_Hash { get; set; }
     public string Role { get; set; } = UserRole.guest.ToString();
     public DateTime Created_At { get; init; } = DateTime.UtcNow;
+    public ICollection<Hotel> Hotels { get; set; } = new List<Hotel>();
     public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
 
