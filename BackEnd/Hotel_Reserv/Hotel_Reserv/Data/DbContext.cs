@@ -19,12 +19,6 @@ namespace Hotel_Reserv.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Hotel - User (Admin creates Hotels)
-            modelBuilder.Entity<Hotel>()
-                .HasOne(h => h.Admin_Id)
-                .WithMany(u => u.Hotels)
-                .HasForeignKey(h => h.CreatedById)
-                .OnDelete(DeleteBehavior.Restrict); // deleting Admin doesn't delete Hotels
 
             // Hotel - RoomType
             modelBuilder.Entity<RoomType>()

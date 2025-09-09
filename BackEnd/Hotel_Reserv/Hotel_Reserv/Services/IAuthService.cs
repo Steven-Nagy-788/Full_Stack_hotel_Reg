@@ -6,11 +6,11 @@ namespace Hotel_Reserv.Services
 {
     public interface IAuthService
     {
-        ValueTask<User?> RegisterAsync(UserDtoReg request);
-        ValueTask<String?> LoginAsync(UserDtoLog request);
-        ValueTask<List<UserDto?>> GetUsersAsync();
-        ValueTask<User?> CreateUserAsync(CreateUserDto request);
-        ValueTask<UpdateUserDto?> UpdateUserAsync(int id,UpdateUserDto upd);
-        ValueTask<User?> DeleteUserAsync(int id);
+        ValueTask<IResult> RegisterAsync(UserDtoReg request);
+        ValueTask<IResult> LoginAsync(UserDtoLog request);
+        ValueTask<IResult> GetUsersAsync();
+        ValueTask<IResult> CreateUserAsync(CreateUserDto request);
+        ValueTask<IResult> UpdateUserAsync(int id, CreateUserDto upd);
+        ValueTask<IResult> DeleteUserAsync(int id);
     }
 }
