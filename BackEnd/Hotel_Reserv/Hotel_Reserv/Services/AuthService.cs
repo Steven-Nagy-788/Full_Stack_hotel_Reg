@@ -59,18 +59,25 @@ namespace Hotel_Reserv.Services
             await db.SaveChangesAsync();
             return user;
         }
-        public async ValueTask<User?> UpdateUserAsync(int id,CreateUserDto upd)
-        {
-            var user =await db.Users.FirstOrDefaultAsync(i => i.Id == id);
-            if (user is null) { return null; }
-            user.Name = upd.UserName;
-            user.Email = upd.Email;
-            var hashedpassword = new PasswordHasher<User>().HashPassword(user,upd.PassWord);
-            user.Password_Hash = hashedpassword;
-            user.Role= upd.Role;
-            db.SaveChanges();
-            return user;
-        }
+        public async ValueTask<UpdateUserDto?> UpdateUserAsync(int id, UpdateUserDto upd)
+{
+    var user = await db.Users.FirstOrDefaultAsync(i => i.Id == id);
+    if (user is null) 
+        return null;
+
+    user.Name = upd.Name;
+    user.Email = upd.Email;
+
+    var hashedPassword = new PasswordHasher<User>().HashPassword(user, upd.Password_Hash);
+    user.Password_Hash = hashedPassword;
+
+    user.Role = upd.Role;
+
+    await db.SaveChangesAsync(); // async save
+
+    return upd;
+}
+
         public async ValueTask<User?> DeleteUserAsync(int id)
         {
             var user =await db.Users.FindAsync(id);
@@ -102,8 +109,7 @@ namespace Hotel_Reserv.Services
                 new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
                 new Claim(ClaimTypes.Name,user.Name),
                 new Claim(ClaimTypes.Email,user.Email),
-                new Claim(ClaimTypes.Role,user.Role),
-                new Claim("created_at", DateTime.UtcNow.ToString("o"))
+                new Claim(ClaimTypes.Role,user.Role)
             };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["AppSettings:Token"]!));
             var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);

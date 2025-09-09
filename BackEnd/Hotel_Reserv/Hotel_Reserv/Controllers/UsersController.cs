@@ -54,11 +54,18 @@ namespace Hotel_Reserv.Controllers
 
         [HttpPut("UpdateUser_{id:int}")]
         [Authorize(Roles = "Admin")]
-        public async ValueTask<ActionResult> UpdateUser(int id, CreateUserDto obj)
+        public async ValueTask<ActionResult> UpdateUser(int id, UpdateUserDto obj)
         {
-            var user= await authservice.UpdateUserAsync(id, obj);
-            if (obj is null) { return BadRequest("INVALID OBJCT"); }
-            return Ok(obj);
+            if (obj is null)
+            {
+                return BadRequest("Invalid object");
+            }
+            var updatedUser = await authservice.UpdateUserAsync(id, obj);
+            if (updatedUser is null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+            return Ok(new { message = "User updated successfully", user = updatedUser });
         }
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "Admin")]

@@ -10,7 +10,7 @@ namespace Hotel_Reserv.Services
         ValueTask<String?> LoginAsync(UserDtoLog request);
         ValueTask<List<UserDto?>> GetUsersAsync();
         ValueTask<User?> CreateUserAsync(CreateUserDto request);
-        ValueTask<User?> UpdateUserAsync(int id,CreateUserDto upd);
+        ValueTask<UpdateUserDto?> UpdateUserAsync(int id,UpdateUserDto upd);
         ValueTask<User?> DeleteUserAsync(int id);
     }
 }

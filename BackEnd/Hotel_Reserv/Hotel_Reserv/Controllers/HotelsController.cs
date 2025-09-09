@@ -40,6 +40,7 @@ namespace Hotel_Reserv.Controllers
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var hotel = await _hotelService.CreateHotelAsync(dto, userId);
+            if (hotel is null) { return Conflict("hotel already exits"); }
             return Ok(hotel);
         }
 
@@ -48,7 +49,7 @@ namespace Hotel_Reserv.Controllers
         public async Task<IActionResult> UpdateHotel(int id, [FromBody] HotelDtoCreate dto)
         {
             var updated = await _hotelService.UpdateHotelAsync(id, dto);
-            if (!updated) return NotFound();
+            if (!updated) return NotFound("id not found");
             return Ok(new { message = "Hotel updated successfully" });
         }
 
@@ -57,7 +58,7 @@ namespace Hotel_Reserv.Controllers
         public async Task<IActionResult> DeleteHotel(int id)
         {
             var deleted = await _hotelService.DeleteHotelAsync(id);
-            if (!deleted) return NotFound();
+            if (!deleted) return NotFound("id not found");
             return Ok(new { message = "Hotel deleted successfully" });
         }
     }

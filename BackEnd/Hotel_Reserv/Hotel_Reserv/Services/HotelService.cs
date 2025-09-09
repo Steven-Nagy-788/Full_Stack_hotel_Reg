@@ -1,4 +1,5 @@
-﻿using Hotel_Reserv.Data;
+﻿using Azure.Core;
+using Hotel_Reserv.Data;
 using Hotel_Reserv.Models;
 using Hotel_Reserv.Models.Dtos;
 using Hotel_Reserv.Models.Dtos.HotelDto;
@@ -17,6 +18,7 @@ namespace Hotel_Reserv.Services
 
         public async Task<IEnumerable<HotelDto>?> GetAllHotelsAsync()
         {
+
             var hotels = await _db.Hotels
                 .ToListAsync();
             if(hotels is null) { return null; }
@@ -58,13 +60,27 @@ namespace Hotel_Reserv.Services
                 City = hotel.City,
                 Address = hotel.Address,
                 Description = hotel.Description,
-                Stars = hotel.Stars
-               };
-            
+                Stars = hotel.Stars,
+                RoomTypes = hotel.RoomTypes?.Select(rt => new RoomTypeDTO
+                {
+                    Name = rt.Name,
+                    Capacity = rt.Capacity,
+                    Base_Price = rt.Base_Price,
+                    Bed_type = rt.Bed_type,
+                    Description = rt.Description,
+                    HotelId = rt.HotelId
+                }).ToList()
+            };
+
+
         }
 
         public async Task<HotelDto> CreateHotelAsync(HotelDtoCreate dto, int userId)
         {
+            if (await _db.Hotels.AnyAsync(u =>
+        u.Name == dto.Name &&
+        u.City == dto.City &&
+        u.Address == dto.Address)){return null;}
             var hotel = new Hotel
             {
                 Name = dto.Name,
