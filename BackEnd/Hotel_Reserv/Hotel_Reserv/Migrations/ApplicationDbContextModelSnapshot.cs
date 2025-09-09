@@ -65,7 +65,7 @@ namespace Hotel_Reserv.Migrations
 
                     b.HasIndex("User_Id");
 
-                    b.ToTable("Bookings", (string)null);
+                    b.ToTable("Bookings");
                 });
 
             modelBuilder.Entity("Hotel_Reserv.Models.Hotel", b =>
@@ -109,7 +109,7 @@ namespace Hotel_Reserv.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.ToTable("Hotels", (string)null);
+                    b.ToTable("Hotels");
                 });
 
             modelBuilder.Entity("Hotel_Reserv.Models.Review", b =>
@@ -142,7 +142,7 @@ namespace Hotel_Reserv.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Reviews", (string)null);
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("Hotel_Reserv.Models.RoomInventory", b =>
@@ -169,7 +169,7 @@ namespace Hotel_Reserv.Migrations
 
                     b.HasIndex("RoomType_ID");
 
-                    b.ToTable("RoomInventories", (string)null);
+                    b.ToTable("RoomInventories");
                 });
 
             modelBuilder.Entity("Hotel_Reserv.Models.RoomType", b =>
@@ -205,7 +205,7 @@ namespace Hotel_Reserv.Migrations
 
                     b.HasIndex("HotelId");
 
-                    b.ToTable("RoomTypes", (string)null);
+                    b.ToTable("RoomTypes");
                 });
 
             modelBuilder.Entity("Hotel_Reserv.Models.User", b =>
@@ -237,7 +237,7 @@ namespace Hotel_Reserv.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Hotel_Reserv.Models.Booking", b =>
@@ -269,13 +269,13 @@ namespace Hotel_Reserv.Migrations
 
             modelBuilder.Entity("Hotel_Reserv.Models.Hotel", b =>
                 {
-                    b.HasOne("Hotel_Reserv.Models.User", "user")
+                    b.HasOne("Hotel_Reserv.Models.User", "Admin_Id")
                         .WithMany("Hotels")
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("user");
+                    b.Navigation("Admin_Id");
                 });
 
             modelBuilder.Entity("Hotel_Reserv.Models.Review", b =>
