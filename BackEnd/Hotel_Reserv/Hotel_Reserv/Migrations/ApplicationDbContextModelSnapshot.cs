@@ -77,11 +77,9 @@ namespace Hotel_Reserv.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Address")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("City")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("CreatedById")
@@ -91,18 +89,15 @@ namespace Hotel_Reserv.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Stars")
                         .HasColumnType("int");
 
                     b.Property<string>("Thumbnail_url")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -220,15 +215,12 @@ namespace Hotel_Reserv.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password_Hash")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Role")
@@ -269,13 +261,13 @@ namespace Hotel_Reserv.Migrations
 
             modelBuilder.Entity("Hotel_Reserv.Models.Hotel", b =>
                 {
-                    b.HasOne("Hotel_Reserv.Models.User", "Admin_Id")
+                    b.HasOne("Hotel_Reserv.Models.User", "Admin")
                         .WithMany("Hotels")
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Admin_Id");
+                    b.Navigation("Admin");
                 });
 
             modelBuilder.Entity("Hotel_Reserv.Models.Review", b =>
