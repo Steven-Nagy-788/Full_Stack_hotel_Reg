@@ -16,12 +16,21 @@ public class BookingService(ApplicationDbContext db) : IBookingService
 
     public async Task<bool> ValidateBookingDate(int hotelId, int roomId, DateOnly wantedDateToCheckIn, DateOnly wantedDateToCheckOut)
     {
-        var alreadyMadeBookings = await db.Bookings.Where(b => b.Hotel_Id == hotelId && b.RoomType_Id == roomId)
-            .AnyAsync(b => 
-                DateOnly.FromDateTime(b.Check_In) < wantedDateToCheckOut && 
-                DateOnly.FromDateTime(b.Check_Out) > wantedDateToCheckIn
-            );
-        return alreadyMadeBookings;
+        var hasOverlappingBookings = await db.Bookings
+                .Where(b => b.Hotel_Id == hotelId &&
+                           b.RoomType_Id == roomId &&
+                           (b.Status == BookingStatus.PENDING ||
+                            b.Status == BookingStatus.CONFIRMED)) // Only check active bookings
+                .AnyAsync(b =>
+                    // Overlap occurs when:
+                    // - Existing booking starts before new booking ends AND
+                    // - Existing booking ends after new booking starts
+                    DateOnly.FromDateTime(b.Check_In) < wantedDateToCheckOut &&
+                    DateOnly.FromDateTime(b.Check_Out) > wantedDateToCheckIn
+                );
+
+        // Return true if dates are available (no overlapping bookings found)
+        return !hasOverlappingBookings;
     }
     public async ValueTask<IResult> CreateBooking(BookingDTO bookingDto)
     {
