@@ -31,6 +31,7 @@ namespace Hotel_Reserv.Services
                 Address = h.Address,
                 Description = h.Description,
                 Stars = h.Stars,
+                Thumbnail_url = h.Thumbnail_url,
                 RoomTypes = h.RoomTypes?.Select(rt => new RoomTypeDTO
                 {
                     Name = rt.Name,
@@ -61,6 +62,7 @@ namespace Hotel_Reserv.Services
                 Address = hotel.Address,
                 Description = hotel.Description,
                 Stars = hotel.Stars,
+                Thumbnail_url= hotel.Thumbnail_url,
                 RoomTypes = hotel.RoomTypes?.Select(rt => new RoomTypeDTO
                 {
                     Name = rt.Name,
@@ -88,6 +90,7 @@ namespace Hotel_Reserv.Services
                 Address = dto.Address,
                 Description = dto.Description,
                 Stars = dto.Stars,
+                Thumbnail_url = dto.Thumbnail_url,
                 CreatedById = userId
             };
 
@@ -102,6 +105,7 @@ namespace Hotel_Reserv.Services
                 Address = hotel.Address,
                 Description = hotel.Description,
                 Stars = hotel.Stars,
+                Thumbnail_url= hotel.Thumbnail_url,
                 RoomTypes = new List<RoomTypeDTO>()
             };
         }
@@ -116,7 +120,7 @@ namespace Hotel_Reserv.Services
             hotel.Address = dto.Address;
             hotel.Description = dto.Description;
             hotel.Stars = dto.Stars;
-
+            hotel.Thumbnail_url = dto.Thumbnail_url;
             await _db.SaveChangesAsync();
             return true;
         }
