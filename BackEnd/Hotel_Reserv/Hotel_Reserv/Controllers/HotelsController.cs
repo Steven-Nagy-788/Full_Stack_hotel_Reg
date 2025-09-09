@@ -44,6 +44,20 @@ namespace Hotel_Reserv.Controllers
             return Ok(hotel);
         }
 
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchHotels(
+                string city,
+                DateTime checkIn,
+                DateTime checkOut,
+                int numberOfClients,
+                int numberOfRooms)
+        {
+            var hotels = await _hotelService.SearchAvailableHotelsAsync(
+                city, checkIn, checkOut, numberOfClients, numberOfRooms);
+
+            return Ok(hotels);
+        }
+
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateHotel(int id, [FromBody] HotelDtoCreate dto)
