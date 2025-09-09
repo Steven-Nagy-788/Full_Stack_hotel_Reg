@@ -15,10 +15,11 @@ namespace Hotel_Reserv.Services
             _db = db;
         }
 
-        public async Task<IEnumerable<HotelDto>> GetAllHotelsAsync()
+        public async Task<IEnumerable<HotelDto>?> GetAllHotelsAsync()
         {
             var hotels = await _db.Hotels
                 .ToListAsync();
+            if(hotels is null) { return null; }
 
             return hotels.Select(h => new HotelDto
             {
@@ -27,10 +28,21 @@ namespace Hotel_Reserv.Services
                 City = h.City,
                 Address = h.Address,
                 Description = h.Description,
-                Stars = h.Stars
-            }).ToList();
-            
-        }
+                Stars = h.Stars,
+                RoomTypes = h.RoomTypes?.Select(rt => new RoomTypeDTO
+                {
+                    Name = rt.Name,
+                    Capacity = rt.Capacity,
+                    Base_Price = rt.Base_Price,
+                    Bed_type = rt.Bed_type,
+                    Description = rt.Description,
+                    HotelId = rt.HotelId
+
+                })
+            .ToList()
+            });
+
+            }
 
         public async Task<HotelDto?> GetHotelByIdAsync(int id)
         {

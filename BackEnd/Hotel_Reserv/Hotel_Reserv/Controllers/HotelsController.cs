@@ -22,6 +22,7 @@ namespace Hotel_Reserv.Controllers
         public async Task<IActionResult> GetAllHotels()
         {
             var hotels = await _hotelService.GetAllHotelsAsync();
+            if(hotels is null) { return BadRequest("no hotels found"); }
             return Ok(hotels);
         }
 
