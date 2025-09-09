@@ -1,7 +1,4 @@
-﻿using Hotel_Reserv.Models.Dtos.RoomtypeDto;
-using System.ComponentModel.DataAnnotations;
-
-namespace Hotel_Reserv.Models.Dtos.HotelDto
+﻿namespace Hotel_Reserv.Models.Dtos.HotelDto
 {
     public class HotelDto
     {
@@ -13,6 +10,6 @@ namespace Hotel_Reserv.Models.Dtos.HotelDto
         public int Stars { get; set; }
 
         // Rooms shown in a simple way (avoid loops)
-        public List<RoomTypeDto>? RoomTypes { get; set; }
+        public List<RoomTypeDTO>? RoomTypes { get; set; }
     }
 }

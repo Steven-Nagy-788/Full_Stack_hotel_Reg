@@ -2,7 +2,6 @@
 using Hotel_Reserv.Models;
 using Hotel_Reserv.Models.Dtos;
 using Hotel_Reserv.Models.Dtos.HotelDto;
-using Hotel_Reserv.Models.Dtos.RoomtypeDto;
 using Microsoft.EntityFrameworkCore;
 
 namespace Hotel_Reserv.Services
@@ -75,7 +74,7 @@ namespace Hotel_Reserv.Services
                 Address = hotel.Address,
                 Description = hotel.Description,
                 Stars = hotel.Stars,
-                RoomTypes = new List<RoomTypeDto>()
+                RoomTypes = new List<RoomTypeDTO>()
             };
         }
 

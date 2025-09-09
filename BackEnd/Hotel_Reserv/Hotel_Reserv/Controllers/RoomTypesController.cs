@@ -1,15 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Hotel_Reserv.Data;
 using Hotel_Reserv.Models;
-using Hotel_Reserv.Models.Dtos;
 using Hotel_Reserv.Services;
-using Hotel_Reserv.Models.Dtos.RoomtypeDto;
 
 namespace Hotel_Reserv.Controllers;
 
