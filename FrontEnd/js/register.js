@@ -4,7 +4,7 @@ let email = document.querySelector("#email");
 let password = document.querySelector("#password");
 let register_btn = document.querySelector("#sign_up");
 
-register_btn.addEventListener("click", function(e) {
+register_btn.addEventListener("click", async function(e) {
     e.preventDefault(); // منع إعادة تحميل الصفحة عند الضغط على submit
 
     // التحقق من أن الحقول ليست فارغة
@@ -21,12 +21,23 @@ register_btn.addEventListener("click", function(e) {
     };
 
     // إرسال البيانات للـ API
-    fetch('https://localhost:7033/api/Users/register', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(userData)
+    // fetch('https://localhost:7033/api/Users/register', {
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json'
+    //     },
+    //     body: JSON.stringify(userData)
+    // })
+    await fetch('https://localhost:7033/api/Users/register', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        name: firstname.value,
+        email: email.value,
+        password: password.value
+    })
     })
     .then(response => {
         if (!response.ok) {
