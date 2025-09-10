@@ -15,21 +15,82 @@ public class BookingService(ApplicationDbContext db) : IBookingService
 
     public async Task<bool> ValidateBookingDate(int hotelId, int roomId, DateOnly wantedDateToCheckIn, DateOnly wantedDateToCheckOut)
     {
-        var hasOverlappingBookings = await db.Bookings
-                .Where(b => b.Hotel_Id == hotelId &&
-                           b.RoomType_Id == roomId &&
-                           (b.Status == BookingStatus.PENDING ||
-                            b.Status == BookingStatus.CONFIRMED)) // Only check active bookings
-                .AnyAsync(b =>
-                    // Overlap occurs when:
-                    // - Existing booking starts before new booking ends AND
-                    // - Existing booking ends after new booking starts
-                    DateOnly.FromDateTime(b.Check_In) < wantedDateToCheckOut &&
-                    DateOnly.FromDateTime(b.Check_Out) > wantedDateToCheckIn
-                );
+        // Get all dates that would be occupied by this booking (excluding checkout date)
+        var bookingDates = GetDateRange(
+            wantedDateToCheckIn.ToDateTime(TimeOnly.MinValue), 
+            wantedDateToCheckOut.ToDateTime(TimeOnly.MinValue)
+        );
 
-        // Return true if dates are available (no overlapping bookings found)
-        return !hasOverlappingBookings;
+        // Check room inventory availability for each date
+        foreach (var date in bookingDates)
+        {
+            var inventory = await db.RoomInventories
+                .FirstOrDefaultAsync(ri => ri.Date.Date == date.Date && ri.RoomType_ID == roomId);
+
+            if (inventory == null)
+            {
+                // No inventory record exists for this date - we need to check if room type exists
+                var roomTypeExists = await db.RoomTypes
+                    .AnyAsync(rt => rt.Id == roomId && rt.HotelId == hotelId);
+                
+                if (!roomTypeExists)
+                    return false; // Room type doesn't exist for this hotel
+                
+                // If no inventory exists, assume rooms are available (will be created when booking)
+                continue;
+            }
+
+            // Check if there are available rooms for this date
+            if (inventory.AvailableRooms <= 0)
+            {
+                return false; // No rooms available for this date
+            }
+        }
+
+        // Return true if all dates have available rooms
+        return true;
+    }
+
+    public async Task<bool> ValidateBookingDateForUpdate(Booking existingBooking, DateOnly newCheckIn, DateOnly newCheckOut)
+    {
+        // Get dates for both old and new booking periods
+        var oldBookingDates = GetDateRange(existingBooking.Check_In, existingBooking.Check_Out);
+        var newBookingDates = GetDateRange(
+            newCheckIn.ToDateTime(TimeOnly.MinValue), 
+            newCheckOut.ToDateTime(TimeOnly.MinValue)
+        );
+
+        // Check availability for each new date
+        foreach (var date in newBookingDates)
+        {
+            var inventory = await db.RoomInventories
+                .FirstOrDefaultAsync(ri => ri.Date.Date == date.Date && ri.RoomType_ID == existingBooking.RoomType_Id);
+
+            if (inventory == null)
+            {
+                // No inventory record exists for this date - assume available
+                continue;
+            }
+
+            // Calculate available rooms considering if this date was previously occupied by this booking
+            var availableRooms = inventory.AvailableRooms;
+            
+            // If the old booking occupied this date and we're still using the same date, 
+            // we have one additional room available (the one being freed up)
+            if (oldBookingDates.Any(oldDate => oldDate.Date == date.Date) && 
+                (existingBooking.Status == BookingStatus.PENDING || existingBooking.Status == BookingStatus.CONFIRMED))
+            {
+                availableRooms += 1; // Add back the room that will be freed from the old booking
+            }
+
+            // Check if there are available rooms for this date
+            if (availableRooms <= 0)
+            {
+                return false; // No rooms available for this date
+            }
+        }
+
+        return true;
     }
     public async ValueTask<IResult> CreateBooking(BookingDTO bookingDto, int userId)
     {
@@ -81,18 +142,15 @@ public class BookingService(ApplicationDbContext db) : IBookingService
         if (roomType == null)
             return Results.BadRequest("Associated room type not found.");
 
-        // Check for booking conflicts (excluding current booking)
-        var unavailable = await db.Bookings
-            .Where(b => b.Hotel_Id == existingBooking.Hotel_Id &&
-                       b.RoomType_Id == existingBooking.RoomType_Id &&
-                       b.Id != id)
-            .AnyAsync(b =>
-                DateOnly.FromDateTime(b.Check_In) < bookingUpdateDto.Check_Out &&
-                DateOnly.FromDateTime(b.Check_Out) > bookingUpdateDto.Check_In
-            );
-
-        if (unavailable)
+        // For updates, we need to check availability while considering the current booking will be freed up
+        var isAvailable = await ValidateBookingDateForUpdate(existingBooking, bookingUpdateDto.Check_In, bookingUpdateDto.Check_Out);
+        if (!isAvailable)
             return Results.Conflict("Room is not available for the selected dates.");
+
+        // Store old dates before updating
+        var oldCheckIn = existingBooking.Check_In;
+        var oldCheckOut = existingBooking.Check_Out;
+        var oldStatus = existingBooking.Status;
 
         // Update properties
         existingBooking.Check_In = bookingUpdateDto.Check_In.ToDateTime(TimeOnly.MinValue);
@@ -101,6 +159,27 @@ public class BookingService(ApplicationDbContext db) : IBookingService
 
         // Recalculate total price
         existingBooking.Total_Price = existingBooking.Nights * roomType.Base_Price;
+
+        // Handle inventory updates if dates changed and booking was/is occupying inventory
+        if ((oldCheckIn != existingBooking.Check_In || oldCheckOut != existingBooking.Check_Out) && 
+            (oldStatus == BookingStatus.PENDING || oldStatus == BookingStatus.CONFIRMED))
+        {
+            // Create a temporary booking object with old dates to free up old inventory
+            var tempOldBooking = new Booking 
+            { 
+                Check_In = oldCheckIn, 
+                Check_Out = oldCheckOut, 
+                RoomType_Id = existingBooking.RoomType_Id,
+                Status = oldStatus
+            };
+            await UpdateRoomInventoryForBooking(tempOldBooking, false); // Free old dates
+
+            // Reserve new dates if booking is still active
+            if (existingBooking.Status == BookingStatus.PENDING || existingBooking.Status == BookingStatus.CONFIRMED)
+            {
+                await UpdateRoomInventoryForBooking(existingBooking, true); // Reserve new dates
+            }
+        }
 
         await db.SaveChangesAsync();
         return Results.Ok(existingBooking);
@@ -191,11 +270,18 @@ public class BookingService(ApplicationDbContext db) : IBookingService
             }
             else if (isReserving)
             {
+                // Try to get total rooms from existing inventory records for this room type
+                var existingInventory = await db.RoomInventories
+                    .Where(ri => ri.RoomType_ID == booking.RoomType_Id)
+                    .FirstOrDefaultAsync();
+                
+                var totalRooms = existingInventory?.Total_Rooms ?? 2; // Default to 2 if no existing inventory
+                
                 // Create new inventory record if it doesn't exist
                 var newInventory = new RoomInventory
                 {
                     Date = date,
-                    Total_Rooms = 10, // Default total rooms - you might want to make this configurable
+                    Total_Rooms = totalRooms,
                     Sold_Rooms = 1,
                     RoomType_ID = booking.RoomType_Id
                 };

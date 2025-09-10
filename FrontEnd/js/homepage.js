@@ -66,10 +66,28 @@ async function searchHotels() {
     results.innerHTML = `<p style="color:white; font-size:18px;">Loading hotels...</p>`;
 
     try {
-        const res = await fetch(`https://localhost:7033/api/Hotel?city=${city}&guests=${guests}&rooms=${rooms}&checkIn=${checkIn}&checkOut=${checkOut}`);
-        if (!res.ok) throw new Error("Failed to fetch hotels");
+        let hotels = []; // outer variable
 
-        const hotels = await res.json();
+        await fetch('https://localhost:7033/api/Search/hotels', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            city: city,
+            checkIn: checkIn,
+            checkOut: checkOut,
+            numberOfGuests: guests,
+            roomTypeName: rooms
+        })
+        })
+        .then(response => response.json()) // parse JSON
+        .then(data => {
+        console.log("Fetched data:", data);  // log data
+        hotels = data;
+        })
+        .catch(error => console.error("Error fetching hotels:", error));
+
 
         if (!hotels || hotels.length === 0) {
             results.innerHTML = `<p style="color:white;">No hotels found for your search.</p>`;
@@ -78,38 +96,35 @@ async function searchHotels() {
 
         // ✅ Use same layout as hotel-details.js
         // ✅ Use same layout as hotel-details.js
-results.innerHTML = hotels.map((hotel, hIndex) => `
-  <div class="hotel-card row align-items-center mb-4 p-3 shadow-lg rounded-lg bg-white">
-    
-    <!-- الصورة -->
-    <div class="col-md-5 text-center">
-      <img src="img/${hotel.thumbnail_url}" 
-           alt="${hotel.name}" 
-           class="hotel-img img-fluid rounded shadow-sm">
-    </div>
+        results.innerHTML = hotels.map((hotel, hIndex) => `
+        <div class="hotel-card row align-items-center mb-4 p-3 shadow-lg rounded-lg bg-white">
+            
+            <!-- الصورة -->
+            <div class="col-md-5 text-center">
+            <img src="img/${hotel.thumbnail_url}" 
+                alt="${hotel.name}" 
+                class="hotel-img img-fluid rounded shadow-sm">
+            </div>
 
-    <!-- التفاصيل -->
-    <div class="col-md-7">
-      <h2 class="hotel-title">${hotel.name}</h2>
-      <p class="city text-muted"><i class="fas fa-map-marker-alt"></i> ${hotel.city}</p>
-      <p>${hotel.description || "No description available."}</p>
+            <!-- التفاصيل -->
+            <div class="col-md-7">
+            <h2 class="hotel-title">${hotel.name}</h2>
+            <p class="city text-muted"><i class="fas fa-map-marker-alt"></i> ${hotel.city}</p>
+            <p>${hotel.description || "No description available."}</p>
 
-      <div class="d-flex gap-2 mt-3">
-        <a href="hotel-details.html?id=${hotel.id}" 
-           class="btn btn-outline-primary mr-2">
-           View Details
-        </a>
-        <button class="btn btn-success book-hotel-btn" 
-                data-hotel-index="${hIndex}">
-          Book Now
-        </button>
-      </div>
-    </div>
-  </div>
-`).join("");
-
-
-
+            <div class="d-flex gap-2 mt-3">
+                <a href="hotel-details.html?id=${hotel.id}" 
+                class="btn btn-outline-primary mr-2">
+                View Details
+                </a>
+                <button class="btn btn-success book-hotel-btn" 
+                        data-hotel-index="${hIndex}">
+                Book Now
+                </button>
+            </div>
+            </div>
+        </div>
+        `).join("");
         // ✅ Add Book Now functionality
         document.querySelectorAll(".book-hotel-btn").forEach(btn => {
           btn.addEventListener("click", (e) => {

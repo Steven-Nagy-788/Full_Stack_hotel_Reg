@@ -173,16 +173,6 @@ async function loadHotels() {
           <p class="city text-muted"><i class="fas fa-map-marker-alt"></i> ${hotel.city}</p>
           <p>${hotel.description || "No description available."}</p>
 
-          <div class="d-flex gap-2 mt-3">
-            <a href="hotel-details.html?id=${hotel.id}" 
-               class="btn btn-outline-primary mr-2">
-               View Details
-            </a>
-            <button class="btn btn-success book-hotel-btn" 
-                    data-hotel-index="${hIndex}">
-              Book Now
-            </button>
-          </div>
         </div>
       </div>
     `).join("");
