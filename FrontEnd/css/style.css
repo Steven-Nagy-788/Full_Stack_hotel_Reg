@@ -477,3 +477,43 @@ input {
     font-size: 13px;
     color: #aaa;
 }
+/* ================================hotle-details==================================== */
+.hotel-card {
+  display: flex;
+  background: #fff;
+  border-radius: 10px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.hotel-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+.hotel-img-container {
+  flex: 0 0 300px;
+  text-align: right;
+}
+.hotel-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+.hotel-details-text {
+  flex: 1;
+}
+.room-card {
+  background: #f9f9f9;
+}
+.room-card:hover {
+  background: #f1f1f1;
+}
+.book-btn {
+  border-radius: 20px;
+  padding: 6px 16px;
+  transition: transform 0.2s, background 0.3s;
+}
+.book-btn:hover {
+  transform: scale(1.05);
+  background: #0069d9;
+  color: #fff;
+}
