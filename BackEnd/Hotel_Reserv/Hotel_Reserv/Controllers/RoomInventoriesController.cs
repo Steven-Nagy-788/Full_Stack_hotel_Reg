@@ -1,108 +1,53 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Hotel_Reserv.Data;
+using Hotel_Reserv.Models;
+using Hotel_Reserv.Models.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Hotel_Reserv.Data;
-using Hotel_Reserv.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
-namespace Hotel_Reserv.Controllers
+namespace Hotel_Reserv.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class RoomInventoriesController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class RoomInventoriesController : ControllerBase
+    private readonly IRoomInventoryService roomInventoryService;
+
+    public RoomInventoriesController(IRoomInventoryService RoomInventoryService)
     {
-        private readonly ApplicationDbContext _context;
-
-        public RoomInventoriesController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-
-        // GET: api/RoomInventories
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<RoomInventory>>> GetRoomInventories()
-        {
-            return await _context.RoomInventories.ToListAsync();
-        }
-
-        // GET: api/RoomInventories/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<RoomInventory>> GetRoomInventory(int id)
-        {
-            var roomInventory = await _context.RoomInventories.FindAsync(id);
-
-            if (roomInventory == null)
-            {
-                return NotFound();
-            }
-
-            return roomInventory;
-        }
-
-        // PUT: api/RoomInventories/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutRoomInventory(int id, RoomInventory roomInventory)
-        {
-            if (id != roomInventory.ID)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(roomInventory).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!RoomInventoryExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/RoomInventories
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<RoomInventory>> PostRoomInventory(RoomInventory roomInventory)
-        {
-            _context.RoomInventories.Add(roomInventory);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetRoomInventory", new { id = roomInventory.ID }, roomInventory);
-        }
-
-        // DELETE: api/RoomInventories/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRoomInventory(int id)
-        {
-            var roomInventory = await _context.RoomInventories.FindAsync(id);
-            if (roomInventory == null)
-            {
-                return NotFound();
-            }
-
-            _context.RoomInventories.Remove(roomInventory);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool RoomInventoryExists(int id)
-        {
-            return _context.RoomInventories.Any(e => e.ID == id);
-        }
+        roomInventoryService = RoomInventoryService;
     }
+
+    [HttpGet]
+    public async ValueTask<IResult> GetAllRoomInv() =>
+        await roomInventoryService.GetAllRoomInvAsync();
+
+    [HttpGet("{id}")]
+    public async ValueTask<IResult> GetRoomInvById(int id) =>
+        await roomInventoryService.GetRoomInvByIdAsync(id);
+
+    [HttpGet("roomType/{id}")]
+    public async ValueTask<IResult> GetRoomInvByRoomTypeId(int id) =>
+    await roomInventoryService.GetRoomInvByRoomTypeIdAsync(id);
+
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    public async ValueTask<IResult> CreateRoomInv(RoomInventroyCreateDto dto) =>
+        await roomInventoryService.CreateRoomInvAsync(dto);
+   
+    [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
+    public async ValueTask<IResult> UpdateRoomInv(int id, RoomInventroyUpdateDto dto) =>
+        await roomInventoryService.UpdateRoomInvAsync(id, dto);
+
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
+    public async ValueTask<IResult> DeleteRoomInv(int id) =>
+        await roomInventoryService.DeleteRoomInvAsync(id);
 }

@@ -47,6 +47,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IHotelService, HotelService>();
 builder.Services.AddScoped<IRoomTypeService, RoomTypeService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IRoomInventoryService, RoomInventoryService>();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
