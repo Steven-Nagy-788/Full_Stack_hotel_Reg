@@ -141,18 +141,16 @@ inputs.forEach(input => {
         if (!localStorage.getItem("token")) {
             localStorage.setItem("redirectAfterLogin", "homepage.html");
             window.location = "login.html";
-        } else {
-            searchHotels();
         }
+        // ✅ No searchHotels() here
     });
 
     input.addEventListener("change", function () {
         if (!localStorage.getItem("token")) {
             localStorage.setItem("redirectAfterLogin", "homepage.html");
             window.location = "login.html";
-        } else {
-            searchHotels();
         }
+        // ✅ No searchHotels() here
     });
 });
 
