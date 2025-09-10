@@ -99,11 +99,12 @@
                             </div>
                             <div class="line">
                                 <label for="">Type of Rooms:</label>
-                                <select name="guests" id="rooms" class="input">
+                                <select name="rooms" id="rooms" class="input">
                                     <option value="1">Double</option>
                                     <option value="2">Single</option>
                                 </select>
                             </div>
+                            
                             <div class="line">
                                  <label for="city">City:</label>
                                 <select name="city" id="city" class="input">
@@ -118,7 +119,7 @@
                             </div>
 
                             <div class="line">
-                                <button class="btn" id="check_btn">Check Aviability</button>
+                                <button type="button" class="btn" id="check_btn">Check Aviability</button>
                             </div>
                         </form>
 
@@ -129,11 +130,11 @@
 </section>
 
 <section class="section-results">
-    <div class="results" id="results">
-    <!-- here will appear hotels -->
-    </div>
-
+  <div class="results" id="results">
+    <div id="hotel-info"><!-- Hotels will load here --></div>
+  </div>
 </section>
+
 
 <footer class="footer" id="contact">
         <div class="container">
