@@ -22,12 +22,12 @@ namespace Hotel_Reserv.Services
             Results.Ok(await db.Hotels.FirstOrDefaultAsync(h => h.Id == id));
         public async ValueTask<IResult> CreateHotelAsync(HotelDtoCreate dto, int userId)
         {
-            if (await db.Hotels.AnyAsync(u =>u.Name == dto.Name &&u.City == dto.City.ToString() && u.Address == dto.Address)) 
+            if (await db.Hotels.AnyAsync(u =>u.Name == dto.Name &&u.City == dto.City && u.Address == dto.Address)) 
                 return Results.Conflict(); 
             var hotel = new Hotel
             {
                 Name = dto.Name,
-                City = dto.City.ToString(),
+                City = dto.City,
                 Address = dto.Address,
                 Description = dto.Description,
                 Stars = dto.Stars,
@@ -45,7 +45,7 @@ namespace Hotel_Reserv.Services
             if (existingHotel is null) 
                 return Results.BadRequest();
             existingHotel.Name = dto.Name;
-            existingHotel.City = dto.City.ToString();
+            existingHotel.City = dto.City;
             existingHotel.Address = dto.Address;
             existingHotel.Description = dto.Description;
             existingHotel.Stars = dto.Stars;

@@ -2,7 +2,6 @@
 using Hotel_Reserv.Data;
 using Hotel_Reserv.Models;
 using Hotel_Reserv.Models.Dtos;
-using Hotel_Reserv.Models.Enums;
 using Hotel_Reserv.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -48,6 +47,7 @@ builder.Services.AddScoped<IHotelService, HotelService>();
 builder.Services.AddScoped<IRoomTypeService, RoomTypeService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IRoomInventoryService, RoomInventoryService>();
+builder.Services.AddScoped<IOrchestrationService, OrchestrationService>();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();

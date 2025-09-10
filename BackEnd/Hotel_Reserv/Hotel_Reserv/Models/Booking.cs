@@ -24,7 +24,7 @@ public class Booking
     public DateTime Check_In { get; set; }
     public DateTime Check_Out { get; set; }
     public int Nights => (Check_Out.Date - Check_In.Date).Days;
-    public int RoomsCount { get; set; } = 1;
+    //public int RoomsCount { get; set; } = 1;
     public decimal Total_Price { get; set; }
     public BookingStatus Status { get; set; } = BookingStatus.PENDING;
     public DateTime Created_At { get; init; } = DateTime.UtcNow;

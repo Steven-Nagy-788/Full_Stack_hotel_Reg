@@ -42,9 +42,16 @@ namespace Hotel_Reserv.Controllers
 
         // POST: api/Bookings
         [HttpPost]
+        [Authorize] // Ensure user is authenticated
         public async Task<IResult> CreateBooking([FromBody] BookingDTO bookingDto)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Results.Problem("User not authenticated or invalid token.", statusCode: 401);
+            }
+            
+            var userId = int.Parse(userIdClaim);
             return await _bookingService.CreateBooking(bookingDto, userId);
         }
 

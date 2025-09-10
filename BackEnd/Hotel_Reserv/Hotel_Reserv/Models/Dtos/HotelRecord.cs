@@ -1,5 +1,4 @@
-﻿using Hotel_Reserv.Models.Enums;
-
+﻿
 namespace Hotel_Reserv.Models.Dtos;
 public record HotelDto(
     int Id,
@@ -12,7 +11,7 @@ public record HotelDto(
 );
 public record HotelDtoCreate(
     string? Name,
-    City City,
+    string? City,
     string? Address,
     string? Description,
     string? Thumbnail_url,
