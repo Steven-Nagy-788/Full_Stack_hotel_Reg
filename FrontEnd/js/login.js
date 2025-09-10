@@ -35,8 +35,12 @@ loginBtn.addEventListener("click", function (e) {
       console.log("=== Login Success ===");
       console.log("JWT Token received:", token);
 
+      // Remove quotes if the token is JSON-serialized
+      const cleanToken = token.replace(/^"(.*)"$/, '$1');
+      console.log("Clean token:", cleanToken);
+
       // حفظ التوكن في localStorage
-      localStorage.setItem("token", token);
+      localStorage.setItem("token", cleanToken);
       console.log("Token stored in localStorage");
 
       // Decode للـ JWT علشان نجيب البيانات
@@ -59,7 +63,7 @@ loginBtn.addEventListener("click", function (e) {
         }
       }
 
-      let payload = parseJwt(token);
+      let payload = parseJwt(cleanToken);
       console.log("JWT Payload parsed:", payload);
       console.log("Available keys in payload:", Object.keys(payload));
 

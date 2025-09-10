@@ -44,9 +44,19 @@ namespace Hotel_Reserv.Services
                             continue;
 
                         // Filter by capacity if number of guests is specified
-                        if (!string.IsNullOrEmpty(request.NumberOfGuests) && 
-                            !string.Equals(roomType.Capacity, request.NumberOfGuests, StringComparison.OrdinalIgnoreCase))
-                            continue;
+                        if (!string.IsNullOrEmpty(request.NumberOfGuests))
+                        {
+                            // Exact match first, then flexible matching
+                            if (!string.Equals(roomType.Capacity, request.NumberOfGuests, StringComparison.OrdinalIgnoreCase))
+                            {
+                                // Try more flexible capacity matching
+                                var normalizedRequestCapacity = request.NumberOfGuests.ToLowerInvariant().Replace(" ", "");
+                                var normalizedRoomCapacity = roomType.Capacity?.ToLowerInvariant().Replace(" ", "") ?? "";
+                                
+                                if (!normalizedRequestCapacity.Equals(normalizedRoomCapacity))
+                                    continue;
+                            }
+                        }
 
                         // Get room inventories for the date range
                         var dateRange = GetDateRange(request.CheckIn, request.CheckOut);
