@@ -20,7 +20,7 @@ namespace Hotel_Reserv.Controllers
 
         // GET: api/Bookings
         [HttpGet("getallbooking")]
-        [Authorize(Roles="guest,Admin")]
+        [Authorize(Roles="guest,Admin,admin")]
         public async Task<IResult> GetBookings()
         {
             return await _bookingService.GetBookings();

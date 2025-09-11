@@ -21,18 +21,18 @@ public class UsersController(IAuthService authservice) : ControllerBase
     public async ValueTask<IResult> Login(UserDtoLog request) => await authservice.LoginAsync(request);
 
     [HttpGet("GetAllUsers")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,admin")]
     public async ValueTask<IResult> GetUsers() => await authservice.GetUsersAsync();
 
     [HttpPost("create_User")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,admin")]
     public async ValueTask<IResult> CreateUser(CreateUserDto obj) => await authservice.CreateUserAsync(obj);
 
     [HttpPut("UpdateUser/{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,admin")]
     public async ValueTask<IResult> UpdateUser(int id, CreateUserDto obj) => await authservice.UpdateUserAsync(id, obj);
 
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,admin")]
     public async ValueTask<IResult> DeleteUser(int id) => await authservice.DeleteUserAsync(id);
 }
