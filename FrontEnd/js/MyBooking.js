@@ -1,53 +1,54 @@
 // MyBooking.js
 
-// API Base URL (غيريه حسب الباك إند عندك)
-const API_URL = "https://localhost:7033/api/Bookings";
+// API Base URL
+const API_URL = "https://localhost:7033/api";
 
-// استرجاع إيميل اليوزر اللي عامل login
-const userEmail = localStorage.getItem("email");
-const payload = localStorage.getItem("payload") ? JSON.parse(localStorage.getItem("payload")) : null;
-const userId = payload ? (
-  payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] ||
-  payload.sub ||
-  payload.id ||
-  payload.nameid
-) : null;
-// Fetch bookings الخاصة باليوزر
+// Helper function to decode JWT
+function parseJwt(token) {
+    try {
+        let base64Url = token.split('.')[1];
+        let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        let jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+    } catch (err) {
+        console.error("Failed to parse token", err);
+        return null;
+    }
+}
+
+// Get User ID from token in localStorage
+function getUserId() {
+    const token = localStorage.getItem("token");
+    if (!token) return null;
+    
+    const payload = parseJwt(token.replace(/^"(.*)"$/, '$1'));
+    if (!payload) return null;
+    
+    // Look for the standard claim name for User ID
+    return payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+}
+
+// Fetch bookings for the logged-in user
 async function fetchBookings() {
   try {
-    const authToken = localStorage.getItem("token");
-    console.log("Token:", authToken ? "Present" : "Missing");
-    console.log("Payload:", payload);
-    console.log("User ID:", userId);
-    console.log("User Email:", userEmail);
+    const authToken = localStorage.getItem("token")?.replace(/^"(.*)"$/, '$1');
+    const userId = getUserId();
     
-    if (!authToken) {
-      console.error("No token found in localStorage");
-      alert("You need to login to view your bookings.");
+    if (!authToken || !userId) {
+      alert("You need to be logged in to view your bookings.");
       window.location = "login.html";
       return [];
     }
     
-    if (!userId) {
-      console.error("No user ID found in localStorage");
-      alert("You need to login to view your bookings.");
-      window.location = "login.html";
-      return [];
-    }
-
-    const headers = {
-      "Content-Type": "application/json",
-    };
-    
-    if (authToken) {
-      headers["Authorization"] = `Bearer ${authToken}`;
-    }
-
-    const res = await fetch(`${API_URL}/get_booking_by_user_id${userId}`, {
-      headers: headers
+    const res = await fetch(`${API_URL}/Bookings/get_booking_by_user_id${userId}`, {
+      headers: {
+        "Authorization": `Bearer ${authToken}`
+      }
     });
 
-    if (!res.ok) throw new Error("Failed to fetch bookings");
+    if (!res.ok) throw new Error(`Failed to fetch bookings. Status: ${res.status}`);
 
     return await res.json();
   } catch (err) {
@@ -56,45 +57,46 @@ async function fetchBookings() {
   }
 }
 
-// Fetch hotel details by ID
+// Fetch hotel details by ID (CORRECTED ENDPOINT)
 async function fetchHotelDetails(hotelId) {
   try {
-    const res = await fetch(`https://localhost:7033/api/Hotels/${hotelId}`);
-    if (!res.ok) return { name: `Hotel ID: ${hotelId}` };
+    const res = await fetch(`${API_URL}/Hotel/${hotelId}`); // Corrected endpoint
+    if (!res.ok) return { name: `Hotel ID: ${hotelId}` }; // Fallback
     const hotel = await res.json();
     return hotel;
   } catch (err) {
-    console.error("Error fetching hotel details:", err);
-    return { name: `Hotel ID: ${hotelId}` };
+    console.error(`Error fetching hotel details for ID ${hotelId}:`, err);
+    return { name: `Hotel ID: ${hotelId}` }; // Fallback
   }
 }
 
-// Fetch room type details by ID
+// Fetch room type details by ID (CORRECTED ENDPOINT)
 async function fetchRoomTypeDetails(roomTypeId) {
   try {
-    const res = await fetch(`https://localhost:7033/api/RoomTypes/${roomTypeId}`);
-    if (!res.ok) return { name: `Room Type ID: ${roomTypeId}` };
+    // Corrected endpoint with URL encoding for the space
+    const res = await fetch(`${API_URL}/RoomTypes/get%20room%20by%20id${roomTypeId}`); 
+    if (!res.ok) return { name: `Room Type ID: ${roomTypeId}` }; // Fallback
     const roomType = await res.json();
     return roomType;
   } catch (err) {
-    console.error("Error fetching room type details:", err);
-    return { name: `Room Type ID: ${roomTypeId}` };
+    console.error(`Error fetching room type details for ID ${roomTypeId}:`, err);
+    return { name: `Room Type ID: ${roomTypeId}` }; // Fallback
   }
 }
 
-// Render bookings في الجدول
+// Render bookings in the table
 async function renderBookings() {
   const tbody = document.getElementById("myBookingsTable");
-  tbody.innerHTML = `<tr><td colspan="9">Loading...</td></tr>`;
+  tbody.innerHTML = `<tr><td colspan="9" style="text-align: center;">Loading...</td></tr>`;
 
   const bookings = await fetchBookings();
 
   if (!bookings || bookings.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="9">No bookings found.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align: center;">No bookings found.</td></tr>`;
     return;
   }
 
-  // Fetch hotel and room type details for all bookings
+  // Fetch all details in parallel for better performance
   const bookingsWithDetails = await Promise.all(
     bookings.map(async (booking) => {
       const [hotel, roomType] = await Promise.all([
@@ -136,9 +138,7 @@ function getStatusBadgeClass(status) {
   switch(status) {
     case 0: return 'bg-warning'; // PENDING
     case 1: return 'bg-success'; // CONFIRMED  
-    case 2: return 'bg-danger';  // REJECTED
-    case 3: return 'bg-secondary'; // CANCELLED
-    case 4: return 'bg-info';    // COMPLETED
+    case 2: return 'bg-danger';  // REJECTED/CANCELLED
     default: return 'bg-secondary';
   }
 }
@@ -148,40 +148,40 @@ function getStatusText(status) {
   switch(status) {
     case 0: return 'Pending';
     case 1: return 'Confirmed';
-    case 2: return 'Rejected';
-    case 3: return 'Cancelled';
-    case 4: return 'Completed';
+    case 2: return 'Cancelled'; // Assuming 2 is Cancelled based on your admin panel
     default: return 'Unknown';
   }
 }
 
-// Cancel booking → API Request
+// Cancel booking API Request
 async function cancelBooking(id) {
-  try {
-    const authToken = localStorage.getItem("token");
-    const headers = {
-      "Content-Type": "application/json",
-    };
-    
-    if (authToken) {
-      headers["Authorization"] = `Bearer ${authToken}`;
+    if (!confirm("Are you sure you want to cancel this booking?")) {
+        return;
     }
 
-    const res = await fetch(`${API_URL}/${id}/status`, {
-      method: "PATCH",
-      headers: headers,
-      body: JSON.stringify({ status: 3 }) // 3 = CANCELLED
-    });
+    try {
+        const authToken = localStorage.getItem("token")?.replace(/^"(.*)"$/, '$1');
+        if (!authToken) {
+            alert("Your session has expired. Please log in again.");
+            return;
+        }
 
-    if (!res.ok) throw new Error("Failed to cancel booking");
+        const res = await fetch(`${API_URL}/Bookings/${id}`, { // Assuming DELETE is used for cancellation
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${authToken}`
+            },
+        });
 
-    alert("Booking cancelled successfully!");
-    renderBookings(); // إعادة تحميل الجدول
-  } catch (err) {
-    console.error("Error cancelling booking:", err);
-    alert("Error cancelling booking");
-  }
+        if (!res.ok) throw new Error("Failed to cancel booking");
+
+        alert("Booking cancelled successfully!");
+        renderBookings();
+    } catch (err) {
+        console.error("Error cancelling booking:", err);
+        alert("Error cancelling booking");
+    }
 }
 
-// أول ما الصفحة تفتح
+// Run when the page loads
 document.addEventListener("DOMContentLoaded", renderBookings);

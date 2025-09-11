@@ -3,8 +3,7 @@ const API_BASE_URL = 'https://localhost:7033/api';
 
 // Get auth token from localStorage
 function getAuthToken() {
-  let token = localStorage.getItem('token'); // Changed from 'authToken' to 'token'
-  // Remove quotes if they exist around the token
+  let token = localStorage.getItem('token');
   if (token && token.startsWith('"') && token.endsWith('"')) {
     token = token.slice(1, -1);
   }
@@ -17,7 +16,6 @@ function isAdmin() {
   if (!token) return false;
   
   try {
-    // Parse JWT token to check role
     const payload = parseJwt(token);
     const userRole = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || payload.role || 'guest';
     return userRole.toLowerCase() === 'admin';
@@ -77,17 +75,18 @@ async function apiRequest(endpoint, options = {}) {
     if (!response.ok) {
       if (response.status === 401) {
         showApiStatus('Authentication required. Please login.', false);
-        // Redirect to login page
         window.location.href = '../login.html';
         return;
       }
+      const errorBody = await response.text();
+      console.error('API Error Response:', errorBody);
       throw new Error(`API error: ${response.status} - ${response.statusText}`);
     }
     
-    // Check if response has content
     const contentType = response.headers.get('Content-Type');
     if (contentType && contentType.includes('application/json')) {
-      return await response.json();
+      const text = await response.text();
+      return text ? JSON.parse(text) : {};
     } else {
       return await response.text();
     }
@@ -98,23 +97,24 @@ async function apiRequest(endpoint, options = {}) {
   }
 }
 
+// --- API FUNCTIONS ---
+
 // Users API Functions
 async function createUser(userData) {
   return await apiRequest('/Users/create_User', {
     method: 'POST',
     body: JSON.stringify({
-      UserName: userData.userName,
-      PassWord: userData.password,
-      Email: userData.email,
-      Role: userData.role
+      name: userData.userName,
+      password: userData.password,
+      email: userData.email,
+      role: userData.role
     })
   });
 }
 
 async function getUsers() {
   try {
-    const users = await apiRequest('/Users/GetAllUsers');
-    return users || [];
+    return await apiRequest('/Users/GetAllUsers') || [];
   } catch (error) {
     console.error('Failed to fetch users:', error);
     return [];
@@ -122,28 +122,25 @@ async function getUsers() {
 }
 
 async function updateUser(id, userData) {
-  return await apiRequest(`/Users/UpdateUser_${id}`, {
+  return await apiRequest(`/Users/UpdateUser/${id}`, {
     method: 'PUT',
     body: JSON.stringify({
-      UserName: userData.userName,
-      Email: userData.email,
-      Role: userData.role,
-      ...(userData.password && { PassWord: userData.password })
+      name: userData.userName,
+      email: userData.email,
+      role: userData.role,
+      ...(userData.password && { password: userData.password })
     })
   });
 }
 
 async function deleteUser(id) {
-  return await apiRequest(`/Users/${id}`, {
-    method: 'DELETE'
-  });
+  return await apiRequest(`/Users/${id}`, { method: 'DELETE' });
 }
 
 // Hotels API Functions
 async function getHotels() {
   try {
-    const hotels = await apiRequest('/Hotel');
-    return hotels || [];
+    return await apiRequest('/Hotel') || [];
   } catch (error) {
     console.error('Failed to fetch hotels:', error);
     return [];
@@ -153,43 +150,25 @@ async function getHotels() {
 async function createHotel(hotelData) {
   return await apiRequest('/Hotel', {
     method: 'POST',
-    body: JSON.stringify({
-      Name: hotelData.name,
-      City: hotelData.city,
-      Address: hotelData.address || '',
-      Description: hotelData.description || '',
-      Thumbnail_url: hotelData.thumbnail_url || '',
-      Stars: hotelData.stars || 3
-    })
+    body: JSON.stringify(hotelData)
   });
 }
 
 async function updateHotel(id, hotelData) {
   return await apiRequest(`/Hotel/${id}`, {
     method: 'PUT',
-    body: JSON.stringify({
-      Name: hotelData.name,
-      City: hotelData.city,
-      Address: hotelData.address || '',
-      Description: hotelData.description || '',
-      Thumbnail_url: hotelData.thumbnail_url || '',
-      Stars: hotelData.stars || 3
-    })
+    body: JSON.stringify(hotelData)
   });
 }
 
 async function deleteHotel(id) {
-  return await apiRequest(`/Hotel/${id}`, {
-    method: 'DELETE'
-  });
+  return await apiRequest(`/Hotel/${id}`, { method: 'DELETE' });
 }
 
 // Room Types API Functions
 async function getRoomTypes() {
   try {
-    const response = await apiRequest('/RoomTypes/hetallrooms');
-    // Handle the IResult response format
-    return response || [];
+    return await apiRequest('/RoomTypes/getallrooms') || [];
   } catch (error) {
     console.error('Failed to fetch room types:', error);
     return [];
@@ -197,44 +176,40 @@ async function getRoomTypes() {
 }
 
 async function createRoomType(roomData) {
-  return await apiRequest('/RoomTypes/create new room', {
+  return await apiRequest('/RoomTypes/create%20new%20room', {
     method: 'POST',
     body: JSON.stringify({
-      Name: roomData.type,
-      Capacity: roomData.capacity || 2,
-      Bed_type: roomData.bed_type || 'Queen',
-      Base_Price: parseFloat(roomData.price),
-      Description: roomData.description || '',
-      HotelId: parseInt(roomData.hotelId)
+      name: roomData.type,
+      capacity: roomData.capacity,
+      base_price: parseFloat(roomData.price),
+      description: roomData.description,
+      hotelID: parseInt(roomData.hotelId)
     })
   });
 }
 
 async function updateRoomType(id, roomData) {
-  return await apiRequest(`/RoomTypes/update ${id}`, {
+  return await apiRequest(`/RoomTypes/update%20${id}`, {
     method: 'PUT',
     body: JSON.stringify({
-      Name: roomData.type,
-      Capacity: roomData.capacity || 2,
-      Bed_type: roomData.bed_type || 'Queen',
-      Base_Price: parseFloat(roomData.price),
-      Description: roomData.description || '',
-      HotelId: parseInt(roomData.hotelId)
+      id: parseInt(id),
+      name: roomData.type,
+      capacity: roomData.capacity,
+      base_Price: parseFloat(roomData.price),
+      description: roomData.description,
+      hotelId: parseInt(roomData.hotelId)
     })
   });
 }
 
 async function deleteRoomType(id) {
-  return await apiRequest(`/RoomTypes/delete  ${id}`, {
-    method: 'DELETE'
-  });
+  return await apiRequest(`/RoomTypes/delete%20%20${id}`, { method: 'DELETE' });
 }
 
 // Bookings API Functions
 async function getBookings() {
   try {
-    const response = await apiRequest('/Bookings/getallbooking');
-    return response || [];
+    return await apiRequest('/Bookings/getallbooking') || [];
   } catch (error) {
     console.error('Failed to fetch bookings:', error);
     return [];
@@ -242,25 +217,21 @@ async function getBookings() {
 }
 
 async function updateBookingStatus(id, status) {
+  const statusMap = { "PENDING": 0, "CONFIRMED": 1, "REJECTED": 2 };
   return await apiRequest(`/Bookings/${id}/status`, {
     method: 'PATCH',
-    body: JSON.stringify({
-      Status: status
-    })
+    body: JSON.stringify({ status: statusMap[status.toUpperCase()] })
   });
 }
 
 async function deleteBooking(id) {
-  return await apiRequest(`/Bookings/${id}`, {
-    method: 'DELETE'
-  });
+  return await apiRequest(`/Bookings/${id}`, { method: 'DELETE' });
 }
 
 // Room Inventory API Functions
 async function getRoomInventories() {
   try {
-    const inventories = await apiRequest('/RoomInventories');
-    return inventories || [];
+    return await apiRequest('/RoomInventories') || [];
   } catch (error) {
     console.error('Failed to fetch room inventories:', error);
     return [];
@@ -271,11 +242,8 @@ async function createRoomInventory(inventoryData) {
   return await apiRequest('/RoomInventories', {
     method: 'POST',
     body: JSON.stringify({
-      HotelId: parseInt(inventoryData.hotelId),
-      RoomTypeId: parseInt(inventoryData.roomId),
-      FromDate: inventoryData.fromDate,
-      ToDate: inventoryData.toDate,
-      AvailableRooms: parseInt(inventoryData.available)
+      totalRooms: parseInt(inventoryData.available),
+      roomTypeId: parseInt(inventoryData.roomId)
     })
   });
 }
@@ -284,138 +252,122 @@ async function updateRoomInventory(id, inventoryData) {
   return await apiRequest(`/RoomInventories/${id}`, {
     method: 'PUT',
     body: JSON.stringify({
-      ID: parseInt(id),
-      HotelId: parseInt(inventoryData.hotelId),
-      RoomTypeId: parseInt(inventoryData.roomId),
-      FromDate: inventoryData.fromDate,
-      ToDate: inventoryData.toDate,
-      AvailableRooms: parseInt(inventoryData.available)
+      totalRooms: parseInt(inventoryData.available),
+      soldRooms: 0
     })
   });
 }
 
 async function deleteRoomInventory(id) {
-  return await apiRequest(`/RoomInventories/${id}`, {
-    method: 'DELETE'
-  });
+  return await apiRequest(`/RoomInventories/${id}`, { method: 'DELETE' });
 }
 
-// Data storage - will be replaced by API calls
-let hotelsData = [];
-let roomsData = [];
-let bookingsData = [];
-let inventoryData = [];
+// --- DATA HANDLING & UI RENDERING ---
+let hotelsData = [], roomsData = [], bookingsData = [], inventoryData = [];
 
-// Load initial data from API
 async function loadInitialData() {
   try {
     showApiStatus('Loading data...', true);
-    
-    // Load data in parallel with error handling for each
-    const dataPromises = [
-      getHotels().catch(err => { console.error('Failed to load hotels:', err); return []; }),
-      getRoomTypes().catch(err => { console.error('Failed to load room types:', err); return []; }),
-      getBookings().catch(err => { console.error('Failed to load bookings:', err); return []; }),
-      getRoomInventories().catch(err => { console.error('Failed to load inventories:', err); return []; })
-    ];
-    
-    const [hotels, rooms, bookings, inventories] = await Promise.all(dataPromises);
-    
-    hotelsData = hotels || [];
-    roomsData = rooms || [];
-    bookingsData = bookings || [];
-    inventoryData = inventories || [];
-    
-    updateDashboardStats();
-    
-    // Show success message only if we have some data
-    const totalItems = hotelsData.length + roomsData.length + bookingsData.length + inventoryData.length;
-    if (totalItems > 0) {
-      showApiStatus(`Loaded ${totalItems} items successfully`, true);
-    } else {
-      showApiStatus('No data found - database may be empty', true);
-    }
+    [hotelsData, roomsData, bookingsData, inventoryData] = await Promise.all([
+      getHotels(), getRoomTypes(), getBookings(), getRoomInventories()
+    ]);
   } catch (error) {
-    console.error('Failed to load initial data:', error);
     showApiStatus('Failed to load data from server', false);
-    
-    // Initialize with empty arrays to prevent errors
-    hotelsData = [];
-    roomsData = [];
-    bookingsData = [];
-    inventoryData = [];
   }
 }
 
-// Update dashboard stats
-function updateDashboardStats() {
-  const hotelsCount = document.getElementById('hotels-count');
-  const roomsCount = document.getElementById('rooms-count');
-  const bookingsCount = document.getElementById('bookings-count');
-  const pendingCount = document.getElementById('pending-count');
-  
-  if (hotelsCount) hotelsCount.textContent = hotelsData.length;
-  if (roomsCount) roomsCount.textContent = roomsData.length;
-  if (bookingsCount) bookingsCount.textContent = bookingsData.length;
-  if (pendingCount) pendingCount.textContent = bookingsData.filter(b => b.status === "Pending").length;
-}
-
-// Helpers
-function getHotelName(id){ 
-  let h=hotelsData.find(h=>h.id==id || h.ID==id); 
+// --- HELPERS ---
+function getHotelName(id) { 
+  const h = hotelsData.find(h => (h.id || h.ID) == id); 
   return h ? (h.name || h.Name) : "Unknown"; 
 }
-function getRoomType(id){ 
-  let r=roomsData.find(r=>r.id==id || r.ID==id); 
-  return r ? (r.type || r.Name) : "N/A"; 
+function getRoomType(id) { 
+  const r = roomsData.find(r => (r.id || r.ID) == id); 
+  return r ? (r.name || r.Name) : "N/A"; 
 }
 
-// Confirmation modal
 function showConfirmation(message, callback) {
   const confirmBody = document.getElementById('confirmBody');
   const confirmAction = document.getElementById('confirmAction');
   
   if (confirmBody && confirmAction) {
     confirmBody.textContent = message;
-    confirmAction.onclick = callback;
+    confirmAction.onclick = () => {
+        callback();
+        bootstrap.Modal.getInstance(document.getElementById("confirmModal")).hide();
+    };
     new bootstrap.Modal(document.getElementById('confirmModal')).show();
   }
 }
 
-// ---------------- Dashboard & Bookings ----------------
+// ---------------- Dashboard & Bookings (MODIFIED) ----------------
 async function renderDashboard(){
-  await loadInitialData(); // Refresh data
+  await loadInitialData();
+  const bookingStatusMap = { 0: 'PENDING', 1: 'CONFIRMED', 2: 'REJECTED' };
+  const pendingBookings = bookingsData.filter(b => b.status === 0);
+  
   return `<h2><i class="fa-solid fa-chart-line"></i> Dashboard</h2>
     <div class="alert alert-info">
-      <i class="fa-solid fa-info-circle"></i> You have ${bookingsData.filter(b=>(b.status || b.Status)=="PENDING").length} pending bookings that need attention.
+      <i class="fa-solid fa-info-circle"></i> You have ${pendingBookings.length} pending bookings that need attention.
     </div>
+    <div class="row mt-4">
+        <div class="col-md-3 mb-3"><div class="card stats-card bg-primary text-white text-center"><div class="card-body"><h5><i class="fa-solid fa-hotel"></i> Hotels</h5><h3>${hotelsData.length}</h3></div></div></div>
+        <div class="col-md-3 mb-3"><div class="card stats-card bg-success text-white text-center"><div class="card-body"><h5><i class="fa-solid fa-bed"></i> Rooms</h5><h3>${roomsData.length}</h3></div></div></div>
+        <div class="col-md-3 mb-3"><div class="card stats-card bg-info text-white text-center"><div class="card-body"><h5><i class="fa-solid fa-calendar-check"></i> Bookings</h5><h3>${bookingsData.length}</h3></div></div></div>
+        <div class="col-md-3 mb-3"><div class="card stats-card bg-warning text-dark text-center"><div class="card-body"><h5><i class="fa-solid fa-clock"></i> Pending</h5><h3>${pendingBookings.length}</h3></div></div></div>
+    </div>
+    <div class="table-responsive mt-4">
+      <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+          <tr><th>ID</th><th>User ID</th><th>Hotel</th><th>Room</th><th>Check In</th><th>Check Out</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          ${pendingBookings.map(b=>`
+            <tr>
+              <td>${b.id}</td>
+              <td>${b.user_Id}</td>
+              <td>${getHotelName(b.hotel_Id)}</td>
+              <td>${getRoomType(b.roomType_Id)}</td>
+              <td>${new Date(b.check_In).toLocaleDateString()}</td>
+              <td>${new Date(b.check_Out).toLocaleDateString()}</td>
+              <td><span class="badge bg-warning">${bookingStatusMap[b.status]}</span></td>
+              <td class="action-buttons">
+                <button class="btn btn-success btn-sm" onclick="confirmBooking(${b.id})"><i class="fa-solid fa-check"></i> Confirm</button>
+                <button class="btn btn-danger btn-sm" onclick="rejectBooking(${b.id})"><i class="fa-solid fa-xmark"></i> Reject</button>
+              </td>
+            </tr>`).join("") || `<tr><td colspan="8" class="text-center">No pending bookings.</td></tr>`}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+async function renderBookings(){
+  await loadInitialData();
+  const bookingStatusMap = { 0: 'PENDING', 1: 'CONFIRMED', 2: 'REJECTED' };
+  const statusClassMap = { 0: 'bg-warning', 1: 'bg-success', 2: 'bg-danger' };
+
+  return `<h2><i class="fa-solid fa-calendar-check"></i> All Bookings</h2>
     <div class="table-responsive">
       <table class="table table-bordered table-hover">
         <thead class="table-dark">
-          <tr>
-            <th>ID</th>
-            <th>User</th>
-            <th>Hotel</th>
-            <th>Room</th>
-            <th>Check In</th>
-            <th>Check Out</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
+          <tr><th>ID</th><th>User ID</th><th>Hotel</th><th>Room</th><th>Check In</th><th>Check Out</th><th>Status</th><th>Actions</th></tr>
         </thead>
         <tbody>
-          ${bookingsData.filter(b=>(b.status || b.Status)=="PENDING").map(b=>`
+          ${bookingsData.map(b=>`
             <tr>
-              <td>${b.id || b.ID}</td>
-              <td>${b.user || b.User || 'N/A'}</td>
-              <td>${getHotelName(b.hotelId || b.Hotel_Id)}</td>
-              <td>${getRoomType(b.roomId || b.RoomType_Id)}</td>
-              <td>${b.checkIn || b.Check_In}</td>
-              <td>${b.checkOut || b.Check_Out}</td>
-              <td><span class="badge bg-warning">${b.status || b.Status}</span></td>
-              <td class="action-buttons">
-                <button class="btn btn-success btn-sm" onclick="confirmBooking(${b.id || b.ID})"><i class="fa-solid fa-check"></i> Confirm</button>
-                <button class="btn btn-danger btn-sm" onclick="rejectBooking(${b.id || b.ID})"><i class="fa-solid fa-xmark"></i> Reject</button>
+              <td>${b.id}</td>
+              <td>${b.user_Id}</td>
+              <td>${getHotelName(b.hotel_Id)}</td>
+              <td>${getRoomType(b.roomType_Id)}</td>
+              <td>${new Date(b.check_In).toLocaleDateString()}</td>
+              <td>${new Date(b.check_Out).toLocaleDateString()}</td>
+              <td><span class="badge ${statusClassMap[b.status]}">${bookingStatusMap[b.status]}</span></td>
+              <td>
+                <select class="form-select form-select-sm" onchange="handleStatusChange(this)" data-booking-id="${b.id}">
+                    <option value="PENDING" ${bookingStatusMap[b.status] === 'PENDING' ? 'selected' : ''}>Pending</option>
+                    <option value="CONFIRMED" ${bookingStatusMap[b.status] === 'CONFIRMED' ? 'selected' : ''}>Confirmed</option>
+                    <option value="REJECTED" ${bookingStatusMap[b.status] === 'REJECTED' ? 'selected' : ''}>Rejected</option>
+                </select>
               </td>
             </tr>
           `).join("")}
@@ -424,37 +376,18 @@ async function renderDashboard(){
     </div>`;
 }
 
-async function renderBookings(){
-  await loadInitialData(); // Refresh data
-  return `<h2><i class="fa-solid fa-calendar-check"></i> All Bookings</h2>
-    <div class="table-responsive">
-      <table class="table table-bordered table-hover">
-        <thead class="table-dark">
-          <tr>
-            <th>ID</th>
-            <th>User</th>
-            <th>Hotel</th>
-            <th>Room</th>
-            <th>Check In</th>
-            <th>Check Out</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${bookingsData.map(b=>`
-            <tr>
-              <td>${b.id || b.ID}</td>
-              <td>${b.user || b.User || 'N/A'}</td>
-              <td>${getHotelName(b.hotelId || b.Hotel_Id)}</td>
-              <td>${getRoomType(b.roomId || b.RoomType_Id)}</td>
-              <td>${b.checkIn || b.Check_In}</td>
-              <td>${b.checkOut || b.Check_Out}</td>
-              <td><span class="badge ${(b.status || b.Status)=="PENDING"?"bg-warning":(b.status || b.Status)=="CONFIRMED"?"bg-success":"bg-danger"}">${b.status || b.Status}</span></td>
-            </tr>
-          `).join("")}
-        </tbody>
-      </table>
-    </div>`;
+async function handleStatusChange(selectElement) {
+    const bookingId = selectElement.dataset.bookingId;
+    const newStatus = selectElement.value;
+
+    try {
+        await updateBookingStatus(bookingId, newStatus);
+        showApiStatus('Booking status updated successfully!');
+        loadPage('bookings'); // Refresh the page to show the updated status
+    } catch (error) {
+        console.error('Failed to update status:', error);
+        showApiStatus('Failed to update status', false);
+    }
 }
 
 async function confirmBooking(id){
@@ -463,7 +396,6 @@ async function confirmBooking(id){
     showApiStatus('Booking confirmed successfully!');
     loadPage("dashboard");
   } catch (error) {
-    console.error('Failed to confirm booking:', error);
     showApiStatus('Failed to confirm booking', false);
   }
 }
@@ -474,14 +406,13 @@ async function rejectBooking(id){
     showApiStatus('Booking rejected successfully!');
     loadPage("dashboard");
   } catch (error) {
-    console.error('Failed to reject booking:', error);
     showApiStatus('Failed to reject booking', false);
   }
 }
 
 // ---------------- Hotels ----------------
 async function renderHotels(){
-  await loadInitialData(); // Refresh data
+  await loadInitialData();
   return `<h2><i class="fa-solid fa-hotel"></i> Hotels</h2>
     <button class="btn btn-primary mb-3" onclick="openHotelForm()"><i class="fa-solid fa-plus"></i> Add Hotel</button>
     <div class="table-responsive">
@@ -506,96 +437,62 @@ async function renderHotels(){
 }
 
 function openHotelForm(id=""){
-  let h = id ? hotelsData.find(h=>(h.id||h.ID)==id) : {name:"",city:"",address:"",description:"",thumbnail_url:"",stars:3};
-  if (id && !h) {
-    h = {name:"",city:"",address:"",description:"",thumbnail_url:"",stars:3};
-  }
+  let h = id ? hotelsData.find(h=>(h.id || h.ID)==id) : {name:"",city:"",address:"",description:"",thumbnail_url:"",stars:3};
+  if (!h) h = {name:"",city:"",address:"",description:"",thumbnail_url:"",stars:3};
   
+  const currentCity = h.city || h.City || '';
+  const cities = ["Cairo", "Alexandria", "Sharm El-Sheikh", "Hurghada", "Luxor", "Aswan", "Giza"];
+
   document.getElementById("modalTitle").innerText=id?"Edit Hotel":"Add Hotel";
   document.getElementById("modalBody").innerHTML=`
     <input type="hidden" id="hotelId" value="${id}">
-    <div class="mb-3">
-      <label class="form-label">Name</label>
-      <input class="form-control" id="hotelName" value="${h.name || h.Name || ''}" placeholder="Enter hotel name" required>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">City</label>
-      <input class="form-control" id="hotelCity" value="${h.city || h.City || ''}" placeholder="Enter city" required>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Address</label>
-      <input class="form-control" id="hotelAddress" value="${h.address || h.Address || ''}" placeholder="Enter address">
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Description</label>
-      <textarea class="form-control" id="hotelDescription" placeholder="Enter description">${h.description || h.Description || ''}</textarea>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Thumbnail URL</label>
-      <input class="form-control" id="hotelThumbnail" value="${h.thumbnail_url || h.Thumbnail_url || ''}" placeholder="Enter thumbnail URL">
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Stars</label>
-      <select class="form-control" id="hotelStars">
-        <option value="1" ${(h.stars || h.Stars)==1?"selected":""}>1 Star</option>
-        <option value="2" ${(h.stars || h.Stars)==2?"selected":""}>2 Stars</option>
-        <option value="3" ${(h.stars || h.Stars)==3?"selected":"selected"}>3 Stars</option>
-        <option value="4" ${(h.stars || h.Stars)==4?"selected":""}>4 Stars</option>
-        <option value="5" ${(h.stars || h.Stars)==5?"selected":""}>5 Stars</option>
-      </select>
-    </div>`;
+    <div class="mb-3"><label class="form-label">Name</label><input class="form-control" id="hotelName" value="${h.name || h.Name || ''}" required></div>
+    <div class="mb-3"><label class="form-label">City</label><select id="hotelCity" class="form-control" required><option value="">Select a city</option>${cities.map(city => `<option value="${city}" ${currentCity === city ? 'selected' : ''}>${city}</option>`).join('')}</select></div>
+    <div class="mb-3"><label class="form-label">Address</label><input class="form-control" id="hotelAddress" value="${h.address || h.Address || ''}"></div>
+    <div class="mb-3"><label class="form-label">Description</label><textarea class="form-control" id="hotelDescription">${h.description || h.Description || ''}</textarea></div>
+    <div class="mb-3"><label class="form-label">Thumbnail URL</label><input class="form-control" id="hotelThumbnail" value="${h.thumbnail_url || h.Thumbnail_url || ''}"></div>
+    <div class="mb-3"><label class="form-label">Stars</label><select class="form-control" id="hotelStars">${[1,2,3,4,5].map(s => `<option value="${s}" ${ (h.stars || h.Stars)==s ? "selected" : ""}>${s} Star${s>1?'s':''}</option>`).join('')}</select></div>`;
   document.getElementById("modalSave").onclick=saveHotel;
   new bootstrap.Modal(document.getElementById("mainModal")).show();
 }
 
 async function saveHotel(){
   let id = document.getElementById("hotelId").value;
-  let name = document.getElementById("hotelName").value.trim();
-  let city = document.getElementById("hotelCity").value.trim();
-  let address = document.getElementById("hotelAddress").value.trim();
-  let description = document.getElementById("hotelDescription").value.trim();
-  let thumbnail_url = document.getElementById("hotelThumbnail").value.trim();
-  let stars = parseInt(document.getElementById("hotelStars").value);
+  const hotelData = {
+    name: document.getElementById("hotelName").value.trim(),
+    city: document.getElementById("hotelCity").value,
+    address: document.getElementById("hotelAddress").value.trim(),
+    description: document.getElementById("hotelDescription").value.trim(),
+    thumbnail_url: document.getElementById("hotelThumbnail").value.trim(),
+    stars: parseInt(document.getElementById("hotelStars").value)
+  };
   
-  if (!name || !city) {
-    showApiStatus("Please fill in all required fields", false);
+  if (!hotelData.name || !hotelData.city) {
+    showApiStatus("Name and City are required", false);
     return;
   }
   
-  const hotelData = {
-    name, city, address, description, thumbnail_url, stars
-  };
+  const saveBtn = document.getElementById('modalSave');
+  saveBtn.disabled = true;
+  saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...';
   
   try {
-    // Show loading state
-    document.getElementById('modalSave').disabled = true;
-    document.getElementById('modalSave').innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Saving...';
-    
-    if(id){
-      await updateHotel(id, hotelData);
-      showApiStatus('Hotel updated successfully!');
-    } else {
-      await createHotel(hotelData);
-      showApiStatus('Hotel created successfully!');
-    }
-    
+    if(id){ await updateHotel(id, hotelData); } else { await createHotel(hotelData); }
+    showApiStatus(`Hotel ${id ? 'updated' : 'created'} successfully!`);
     bootstrap.Modal.getInstance(document.getElementById("mainModal")).hide();
     loadPage("hotels");
   } catch (error) {
-    console.error('Failed to save hotel:', error);
     showApiStatus('Failed to save hotel', false);
   } finally {
-    // Reset button state
-    document.getElementById('modalSave').disabled = false;
-    document.getElementById('modalSave').innerHTML = 'Save';
+    saveBtn.disabled = false;
+    saveBtn.innerHTML = 'Save';
   }
 }
 
 function confirmDeleteHotel(id) {
   const hotel = hotelsData.find(h => (h.id||h.ID) == id);
   const hotelName = hotel ? (hotel.name || hotel.Name) : 'this hotel';
-  showConfirmation(`Are you sure you want to delete "${hotelName}"? This action cannot be undone.`, 
-    () => deleteHotelRecord(id));
+  showConfirmation(`Are you sure you want to delete "${hotelName}"?`, () => deleteHotelRecord(id));
 }
 
 async function deleteHotelRecord(id){ 
@@ -604,29 +501,27 @@ async function deleteHotelRecord(id){
     showApiStatus('Hotel deleted successfully!');
     loadPage("hotels");
   } catch (error) {
-    console.error('Failed to delete hotel:', error);
     showApiStatus('Failed to delete hotel', false);
   }
 }
 
 // ---------------- Rooms ----------------
 async function renderRooms(){
-  await loadInitialData(); // Refresh data
+  await loadInitialData();
   return `<h2><i class="fa-solid fa-bed"></i> Room Types</h2>
     <button class="btn btn-primary mb-3" onclick="openRoomForm()"><i class="fa-solid fa-plus"></i> Add Room Type</button>
     <div class="table-responsive">
       <table class="table table-striped table-hover">
         <thead class="table-dark">
-          <tr><th>ID</th><th>Hotel</th><th>Name</th><th>Capacity</th><th>Bed Type</th><th>Price</th><th>Actions</th></tr>
+          <tr><th>ID</th><th>Hotel</th><th>Name</th><th>Capacity</th><th>Price</th><th>Actions</th></tr>
         </thead>
         <tbody>
           ${roomsData.map(r=>`<tr>
             <td>${r.id || r.ID}</td>
             <td>${getHotelName(r.hotelId || r.HotelId)}</td>
-            <td>${r.type || r.Name}</td>
+            <td>${r.name || r.Name}</td>
             <td>${r.capacity || r.Capacity || 'N/A'}</td>
-            <td>${r.bed_type || r.Bed_type || 'N/A'}</td>
-            <td>$${r.price || r.Base_Price}</td>
+            <td>$${r.base_Price || r.Base_Price}</td>
             <td class="action-buttons">
               <button class="btn btn-warning btn-sm" onclick="openRoomForm(${r.id || r.ID})"><i class="fa-solid fa-pen"></i> Edit</button>
               <button class="btn btn-danger btn-sm" onclick="confirmDeleteRoom(${r.id || r.ID})"><i class="fa-solid fa-trash"></i> Delete</button>
@@ -637,106 +532,63 @@ async function renderRooms(){
 }
 
 function openRoomForm(id=""){
-  let r = id ? roomsData.find(r=>(r.id||r.ID)==id) : {hotelId:"",type:"",capacity:2,bed_type:"Queen",price:"",description:""};
-  if (id && !r) {
-    r = {hotelId:"",type:"",capacity:2,bed_type:"Queen",price:"",description:""};
-  }
+  let r = id ? roomsData.find(r=>(r.id||r.ID)==id) : {};
+  if (!r) r = {};
   
-  let hotelOptions = hotelsData.map(h => 
-    `<option value="${h.id || h.ID}" ${(r.hotelId||r.HotelId)==(h.id||h.ID)?"selected":""}>${h.name || h.Name}</option>`
-  ).join("");
+  let hotelOptions = hotelsData.map(h => `<option value="${h.id || h.ID}" ${(r.hotelId || r.HotelId)==(h.id || h.ID)?"selected":""}>${h.name || h.Name}</option>`).join("");
+
+  const capacityOptions = ["1 Adult", "2 Adults", "2 Adults + 1 kid", "2 Adults + 2 kids", "2 Adults + 3 kids", "3 Adults + 4 kids", "4 Adults + 4 kids", "4 Adults + 5 kids"];
+  const currentCapacity = r.capacity || r.Capacity || '2 Adults';
+  const roomTypeOptions = ["Single", "Double"];
+  const currentRoomType = r.name || r.Name || '';
   
   document.getElementById("modalTitle").innerText=id?"Edit Room Type":"Add Room Type";
   document.getElementById("modalBody").innerHTML=`
     <input type="hidden" id="roomId" value="${id}">
-    <div class="mb-3">
-      <label class="form-label">Hotel</label>
-      <select class="form-control" id="roomHotel" required>
-        <option value="">Select Hotel</option>
-        ${hotelOptions}
-      </select>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Room Type Name</label>
-      <input class="form-control" id="roomType" value="${r.type || r.Name || ''}" placeholder="Enter room type name" required>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Capacity</label>
-      <input type="number" class="form-control" id="roomCapacity" value="${r.capacity || r.Capacity || 2}" min="1" max="10" required>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Bed Type</label>
-      <select class="form-control" id="roomBedType" required>
-        <option value="Single" ${(r.bed_type||r.Bed_type)=="Single"?"selected":""}>Single</option>
-        <option value="Double" ${(r.bed_type||r.Bed_type)=="Double"?"selected":""}>Double</option>
-        <option value="Queen" ${(r.bed_type||r.Bed_type)=="Queen"?"selected":"selected"}>Queen</option>
-        <option value="King" ${(r.bed_type||r.Bed_type)=="King"?"selected":""}>King</option>
-        <option value="Twin" ${(r.bed_type||r.Bed_type)=="Twin"?"selected":""}>Twin</option>
-      </select>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Base Price</label>
-      <div class="input-group">
-        <span class="input-group-text">$</span>
-        <input type="number" class="form-control" id="roomPrice" value="${r.price || r.Base_Price || ''}" min="0" step="0.01" placeholder="Enter base price" required>
-      </div>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Description</label>
-      <textarea class="form-control" id="roomDescription" placeholder="Enter description">${r.description || r.Description || ''}</textarea>
-    </div>`;
+    <div class="mb-3"><label class="form-label">Hotel</label><select class="form-control" id="roomHotel" required><option value="">Select Hotel</option>${hotelOptions}</select></div>
+    <div class="mb-3"><label class="form-label">Room Type Name</label><select class="form-control" id="roomType" required><option value="">Select Room Type</option>${roomTypeOptions.map(opt => `<option value="${opt}" ${currentRoomType === opt ? 'selected' : ''}>${opt}</option>`).join('')}</select></div>
+    <div class="mb-3"><label class="form-label">Capacity</label><select class="form-control" id="roomCapacity" required>${capacityOptions.map(opt => `<option value="${opt}" ${currentCapacity === opt ? 'selected' : ''}>${opt}</option>`).join('')}</select></div>
+    <div class="mb-3"><label class="form-label">Base Price</label><div class="input-group"><span class="input-group-text">$</span><input type="number" class="form-control" id="roomPrice" value="${r.base_Price || r.Base_Price || ''}" min="0" step="0.01" required></div></div>
+    <div class="mb-3"><label class="form-label">Description</label><textarea class="form-control" id="roomDescription">${r.description || r.Description || ''}</textarea></div>`;
   document.getElementById("modalSave").onclick=saveRoom;
   new bootstrap.Modal(document.getElementById("mainModal")).show();
 }
 
 async function saveRoom(){
   let id = document.getElementById("roomId").value;
-  let hotelId = parseInt(document.getElementById("roomHotel").value);
-  let type = document.getElementById("roomType").value.trim();
-  let capacity = parseInt(document.getElementById("roomCapacity").value);
-  let bed_type = document.getElementById("roomBedType").value;
-  let price = parseFloat(document.getElementById("roomPrice").value);
-  let description = document.getElementById("roomDescription").value.trim();
-  
-  if (!hotelId || !type || !capacity || !bed_type || !price) {
-    showApiStatus("Please fill in all required fields", false);
-    return;
-  }
-  
   const roomData = {
-    hotelId, type, capacity, bed_type, price, description
+      hotelId: document.getElementById("roomHotel").value,
+      type: document.getElementById("roomType").value,
+      capacity: document.getElementById("roomCapacity").value,
+      price: parseFloat(document.getElementById("roomPrice").value),
+      description: document.getElementById("roomDescription").value.trim()
   };
   
+  if (!roomData.hotelId || !roomData.type || !roomData.capacity || isNaN(roomData.price)) {
+    showApiStatus("Please fill all required fields", false); return;
+  }
+  
+  const saveBtn = document.getElementById('modalSave');
+  saveBtn.disabled = true;
+  saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...';
+  
   try {
-    // Show loading state
-    document.getElementById('modalSave').disabled = true;
-    document.getElementById('modalSave').innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Saving...';
-    
-    if(id){
-      await updateRoomType(id, roomData);
-      showApiStatus('Room type updated successfully!');
-    } else {
-      await createRoomType(roomData);
-      showApiStatus('Room type created successfully!');
-    }
-    
+    if(id){ await updateRoomType(id, roomData); } else { await createRoomType(roomData); }
+    showApiStatus(`Room type ${id ? 'updated' : 'created'} successfully!`);
     bootstrap.Modal.getInstance(document.getElementById("mainModal")).hide();
     loadPage("rooms");
   } catch (error) {
-    console.error('Failed to save room type:', error);
     showApiStatus('Failed to save room type', false);
   } finally {
-    // Reset button state
-    document.getElementById('modalSave').disabled = false;
-    document.getElementById('modalSave').innerHTML = 'Save';
+    saveBtn.disabled = false;
+    saveBtn.innerHTML = 'Save';
   }
 }
 
 function confirmDeleteRoom(id) {
   const room = roomsData.find(r => (r.id||r.ID) == id);
-  const roomName = room ? (room.type || room.Name) : 'this room type';
-  showConfirmation(`Are you sure you want to delete "${roomName}" room type? This action cannot be undone.`, 
-    () => deleteRoomRecord(id));
+  const roomName = room ? (room.name || room.Name) : 'this room';
+  showConfirmation(`Are you sure you want to delete "${roomName}"?`, () => deleteRoomRecord(id));
 }
 
 async function deleteRoomRecord(id){ 
@@ -745,29 +597,26 @@ async function deleteRoomRecord(id){
     showApiStatus('Room type deleted successfully!');
     loadPage("rooms");
   } catch (error) {
-    console.error('Failed to delete room type:', error);
     showApiStatus('Failed to delete room type', false);
   }
 }
 
 // ---------------- Inventory ----------------
 async function renderInventory(){
-  await loadInitialData(); // Refresh data
+  await loadInitialData();
   return `<h2><i class="fa-solid fa-box"></i> Room Inventory</h2>
     <button class="btn btn-primary mb-3" onclick="openInventoryForm()"><i class="fa-solid fa-plus"></i> Add Inventory</button>
     <div class="table-responsive">
       <table class="table table-striped table-hover">
         <thead class="table-dark">
-          <tr><th>ID</th><th>Hotel</th><th>Room Type</th><th>From</th><th>To</th><th>Available</th><th>Actions</th></tr>
+          <tr><th>ID</th><th>Room Type</th><th>Total Rooms</th><th>Sold Rooms</th><th>Actions</th></tr>
         </thead>
         <tbody>
-          ${inventoryData.map(i=>`<tr>
+          ${inventoryData.map(i => `<tr>
             <td>${i.id || i.ID}</td>
-            <td>${getHotelName(i.hotelId || i.HotelId)}</td>
-            <td>${getRoomType(i.roomId || i.RoomTypeId)}</td>
-            <td>${i.fromDate || i.FromDate}</td>
-            <td>${i.toDate || i.ToDate}</td>
-            <td>${i.available || i.AvailableRooms}</td>
+            <td>${getRoomType(i.roomTypeId || i.RoomTypeId || i.roomType_ID)}</td> 
+            <td>${i.totalRooms || i.TotalRooms || i.total_Rooms || 0}</td>
+            <td>${i.soldRooms || i.SoldRooms || i.sold_Rooms || 0}</td>
             <td class="action-buttons">
               <button class="btn btn-warning btn-sm" onclick="openInventoryForm(${i.id || i.ID})"><i class="fa-solid fa-pen"></i> Edit</button>
               <button class="btn btn-danger btn-sm" onclick="confirmDeleteInventory(${i.id || i.ID})"><i class="fa-solid fa-trash"></i> Delete</button>
@@ -778,132 +627,51 @@ async function renderInventory(){
 }
 
 function openInventoryForm(id=""){
-  let inv = id ? inventoryData.find(i=>(i.id||i.ID)==id) : {hotelId:"",roomId:"",fromDate:"",toDate:"",available:1};
-  if (id && !inv) {
-    inv = {hotelId:"",roomId:"",fromDate:"",toDate:"",available:1};
-  }
+  let inv = id ? inventoryData.find(i => (i.id || i.ID) == id) : {};
+  if (!inv) inv = {};
   
-  let hotelOptions = hotelsData.map(h => 
-    `<option value="${h.id || h.ID}" ${(inv.hotelId||inv.HotelId)==(h.id||h.ID)?"selected":""}>${h.name || h.Name}</option>`
-  ).join("");
+  let roomOptions = roomsData.map(r => `<option value="${r.id || r.ID}" ${ (inv.roomTypeId || inv.RoomTypeId || inv.roomType_ID) == (r.id || r.ID) ? "selected" : ""}>${r.name || r.Name} (${getHotelName(r.hotelId || r.HotelId)})</option>`).join("");
   
   document.getElementById("modalTitle").innerText=id?"Edit Inventory":"Add Inventory";
   document.getElementById("modalBody").innerHTML=`
     <input type="hidden" id="inventoryId" value="${id}">
-    <div class="mb-3">
-      <label class="form-label">Hotel</label>
-      <select class="form-control" id="inventoryHotel" required onchange="updateRoomOptions()">
-        <option value="">Select Hotel</option>
-        ${hotelOptions}
-      </select>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Room Type</label>
-      <select class="form-control" id="inventoryRoom" required>
-        <option value="">Select Room Type</option>
-      </select>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">From Date</label>
-      <input type="date" class="form-control" id="inventoryFrom" value="${inv.fromDate || inv.FromDate || ''}" required>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">To Date</label>
-      <input type="date" class="form-control" id="inventoryTo" value="${inv.toDate || inv.ToDate || ''}" required>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Available Rooms</label>
-      <input type="number" class="form-control" id="inventoryAvailable" value="${inv.available || inv.AvailableRooms || 1}" min="0" required>
-    </div>`;
-  
-  // Populate room options after modal is shown
-  setTimeout(() => {
-    updateRoomOptions();
-    // Set the selected room if editing
-    if (id && (inv.roomId || inv.RoomTypeId)) {
-      document.getElementById('inventoryRoom').value = inv.roomId || inv.RoomTypeId;
-    }
-  }, 100);
+    <div class="mb-3"><label class="form-label">Room Type</label><select class="form-control" id="inventoryRoom" required><option value="">Select Room Type</option>${roomOptions}</select></div>
+    <div class="mb-3"><label class="form-label">Total Rooms</label><input type="number" class="form-control" id="inventoryAvailable" value="${inv.totalRooms || inv.TotalRooms || inv.total_Rooms || 1}" min="0" required></div>`;
   
   document.getElementById("modalSave").onclick=saveInventory;
   new bootstrap.Modal(document.getElementById("mainModal")).show();
 }
 
-// Helper function to update room options based on selected hotel
-function updateRoomOptions() {
-  const hotelSelect = document.getElementById('inventoryHotel');
-  const roomSelect = document.getElementById('inventoryRoom');
-  
-  if (!hotelSelect || !roomSelect) return;
-  
-  const selectedHotelId = hotelSelect.value;
-  roomSelect.innerHTML = '<option value="">Select Room Type</option>';
-  
-  if (selectedHotelId) {
-    const filteredRooms = roomsData.filter(r => 
-      (r.hotelId || r.HotelId) == selectedHotelId
-    );
-    
-    filteredRooms.forEach(r => {
-      const option = document.createElement('option');
-      option.value = r.id || r.ID;
-      option.textContent = r.type || r.Name;
-      roomSelect.appendChild(option);
-    });
-  }
-}
-
 async function saveInventory(){
   let id = document.getElementById("inventoryId").value;
-  let hotelId = parseInt(document.getElementById("inventoryHotel").value);
-  let roomId = parseInt(document.getElementById("inventoryRoom").value);
-  let fromDate = document.getElementById("inventoryFrom").value;
-  let toDate = document.getElementById("inventoryTo").value;
-  let available = parseInt(document.getElementById("inventoryAvailable").value);
-  
-  if (!hotelId || !roomId || !fromDate || !toDate || available < 0) {
-    showApiStatus("Please fill in all fields with valid values", false);
-    return;
-  }
-  
-  // Validate date range
-  if (new Date(fromDate) >= new Date(toDate)) {
-    showApiStatus("To date must be after from date", false);
-    return;
-  }
-  
   const inventoryData = {
-    hotelId, roomId, fromDate, toDate, available
+      roomId: document.getElementById("inventoryRoom").value,
+      available: parseInt(document.getElementById("inventoryAvailable").value)
   };
   
+  if (!inventoryData.roomId || isNaN(inventoryData.available) || inventoryData.available < 0) {
+    showApiStatus("Please fill all fields correctly", false); return;
+  }
+  
+  const saveBtn = document.getElementById('modalSave');
+  saveBtn.disabled = true;
+  saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...';
+  
   try {
-    // Show loading state
-    document.getElementById('modalSave').disabled = true;
-    document.getElementById('modalSave').innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Saving...';
-    
-    if(id){
-      await updateRoomInventory(id, inventoryData);
-      showApiStatus('Inventory updated successfully!');
-    } else {
-      await createRoomInventory(inventoryData);
-      showApiStatus('Inventory created successfully!');
-    }
-    
+    if(id){ await updateRoomInventory(id, inventoryData); } else { await createRoomInventory(inventoryData); }
+    showApiStatus(`Inventory ${id ? 'updated' : 'created'} successfully!`);
     bootstrap.Modal.getInstance(document.getElementById("mainModal")).hide();
     loadPage("inventory");
   } catch (error) {
-    console.error('Failed to save inventory:', error);
     showApiStatus('Failed to save inventory', false);
   } finally {
-    // Reset button state
-    document.getElementById('modalSave').disabled = false;
-    document.getElementById('modalSave').innerHTML = 'Save';
+    saveBtn.disabled = false;
+    saveBtn.innerHTML = 'Save';
   }
 }
 
 function confirmDeleteInventory(id) {
-  showConfirmation(`Are you sure you want to delete this inventory record? This action cannot be undone.`, 
-    () => deleteInventoryRecord(id));
+  showConfirmation(`Are you sure you want to delete this inventory record?`, () => deleteInventoryRecord(id));
 }
 
 async function deleteInventoryRecord(id){ 
@@ -912,242 +680,144 @@ async function deleteInventoryRecord(id){
     showApiStatus('Inventory deleted successfully!');
     loadPage("inventory");
   } catch (error) {
-    console.error('Failed to delete inventory:', error);
     showApiStatus('Failed to delete inventory', false);
   }
 }
 
 // ---------------- Users ----------------
 async function renderUsers(){
-  try {
-    const users = await getUsers();
-    return `<h2><i class="fa-solid fa-users"></i> Users</h2>
-      <button class="btn btn-primary mb-3" onclick="openUserForm()"><i class="fa-solid fa-plus"></i> Add User</button>
-      <div class="table-responsive">
-        <table class="table table-striped table-hover">
-          <thead class="table-dark">
+  const users = await getUsers();
+  return `<h2><i class="fa-solid fa-users"></i> Users</h2>
+    <button class="btn btn-primary mb-3" onclick="openUserForm()"><i class="fa-solid fa-plus"></i> Add User</button>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          ${users.map(u => `
             <tr>
-              <th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${users.map(u => `
-              <tr>
-                <td>${u.id}</td>
-                <td>${u.userName}</td>
-                <td><span class="badge ${u.role === 'Admin' ? 'bg-danger' : 'bg-primary'}">${u.role}</span></td>
-                <td class="action-buttons">
-                  <button class="btn btn-warning btn-sm" onclick="openUserForm(${u.id})"><i class="fa-solid fa-pen"></i> Edit</button>
-                  <button class="btn btn-danger btn-sm" onclick="confirmDeleteUser(${u.id})"><i class="fa-solid fa-trash"></i> Delete</button>
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>`;
-  } catch (error) {
-    return `<div class="alert alert-danger">Failed to load users: ${error.message}</div>`;
-  }
+              <td>${u.id}</td>
+              <td>${u.name || u.userName}</td>
+              <td>${u.email}</td>
+              <td><span class="badge ${ (u.role || '').toLowerCase() === 'admin' ? 'bg-danger' : 'bg-primary'}">${u.role}</span></td>
+              <td class="action-buttons">
+                <button class="btn btn-warning btn-sm" onclick='openUserForm(${JSON.stringify(u)})'><i class="fa-solid fa-pen"></i> Edit</button>
+                <button class="btn btn-danger btn-sm" onclick="confirmDeleteUser(${u.id})"><i class="fa-solid fa-trash"></i> Delete</button>
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
 }
 
-function openUserForm(id = null){
-  // In a real app, you would fetch the user data from API if editing
-  const isEdit = id !== null;
-  document.getElementById("modalTitle").innerText = isEdit ? "Edit User" : "Add User";
+function openUserForm(user = null){
+  const userData = user || {};
+  document.getElementById("modalTitle").innerText = user ? "Edit User" : "Add User";
   document.getElementById("modalBody").innerHTML = `
-    <input type="hidden" id="userId" value="${isEdit ? id : ''}">
-    <div class="mb-3">
-      <label class="form-label">User Name</label>
-      <input class="form-control" id="userName" value="${isEdit ? 'User ' + id : ''}" placeholder="Enter user name" required>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Email</label>
-      <input type="email" class="form-control" id="userEmail" value="${isEdit ? 'user' + id + '@test.com' : ''}" placeholder="Enter email" required>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Password</label>
-      <input type="password" class="form-control" id="userPassword" placeholder="Enter password" ${isEdit ? '' : 'required'}>
-      ${isEdit ? '<div class="form-text">Leave blank to keep current password</div>' : ''}
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Role</label>
-      <select class="form-control" id="userRole" required>
-        <option value="">Select Role</option>
-        <option value="Admin" ${isEdit ? 'selected' : ''}>Admin</option>
-        <option value="User" ${!isEdit ? 'selected' : ''}>User</option>
-      </select>
-    </div>`;
-  document.getElementById("modalSave").onclick = () => saveUser(id);
+    <input type="hidden" id="userId" value="${userData.id || ''}">
+    <div class="mb-3"><label class="form-label">User Name</label><input class="form-control" id="userName" value="${userData.name || userData.userName || ''}" required></div>
+    <div class="mb-3"><label class="form-label">Email</label><input type="email" class="form-control" id="userEmail" value="${userData.email || ''}" required></div>
+    <div class="mb-3"><label class="form-label">Password</label><input type="password" class="form-control" id="userPassword" placeholder="${user ? 'Leave blank to keep current' : 'Enter password'}" ${user ? '' : 'required'}></div>
+    <div class="mb-3"><label class="form-label">Role</label><select class="form-control" id="userRole" required><option value="">Select Role</option><option value="Admin" ${ (userData.role || '').toLowerCase() === 'admin' ? 'selected' : ''}>Admin</option><option value="guest" ${ (userData.role || '').toLowerCase() === 'guest' ? 'selected' : ''}>Guest</option></select></div>`;
+  document.getElementById("modalSave").onclick = () => saveUser(userData.id || null);
   new bootstrap.Modal(document.getElementById("mainModal")).show();
 }
 
 async function saveUser(id){
-  const userName = document.getElementById("userName").value.trim();
-  const email = document.getElementById("userEmail").value.trim();
-  const password = document.getElementById("userPassword").value;
-  const role = document.getElementById("userRole").value;
+  const userData = {
+      userName: document.getElementById("userName").value.trim(),
+      email: document.getElementById("userEmail").value.trim(),
+      password: document.getElementById("userPassword").value,
+      role: document.getElementById("userRole").value
+  };
   
-  // Basic validation
-  if (!userName || !email || !role) {
-    showApiStatus('Please fill in all required fields', false);
-    return;
+  if (!userData.userName || !userData.email || !userData.role || (!id && !userData.password)) {
+    showApiStatus('Please fill all required fields', false); return;
   }
   
-  if (!id && !password) {
-    showApiStatus('Password is required for new users', false);
-    return;
-  }
-  
-  // Email validation
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    showApiStatus('Please enter a valid email address', false);
-    return;
-  }
-  
-  // Show loading state
   const saveBtn = document.getElementById('modalSave');
-  const originalText = saveBtn.innerHTML;
-  saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Saving...';
   saveBtn.disabled = true;
+  saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...';
   
   try {
-    const userData = {
-      userName: userName,
-      email: email,
-      role: role,
-      ...(password && { password: password }) // Only include password if provided
-    };
-    
-    if (id) {
-      // Update existing user
-      await updateUser(id, userData);
-      showApiStatus('User updated successfully!');
-    } else {
-      // Create new user - THIS IS THE REAL API CALL
-      await createUser(userData);
-      showApiStatus('User created successfully!');
-    }
-    
-    // Close modal and refresh data
+    if (id) { await updateUser(id, userData); } else { await createUser(userData); }
+    showApiStatus(`User ${id ? 'updated' : 'created'} successfully!`);
     bootstrap.Modal.getInstance(document.getElementById("mainModal")).hide();
     loadPage('users');
   } catch (error) {
-    console.error('Failed to save user:', error);
-    showApiStatus('Failed to save user. Please try again.', false);
+    showApiStatus('Failed to save user.', false);
   } finally {
-    // Reset button state
-    saveBtn.innerHTML = originalText;
     saveBtn.disabled = false;
+    saveBtn.innerHTML = 'Save';
   }
 }
 
 function confirmDeleteUser(id) {
-  showConfirmation(`Are you sure you want to delete this user? This action cannot be undone.`, 
-    async () => {
-      try {
+  showConfirmation(`Are you sure you want to delete this user?`, () => deleteUserRecord(id));
+}
+
+async function deleteUserRecord(id) {
+    try {
         await deleteUser(id);
         showApiStatus('User deleted successfully');
         loadPage('users');
-      } catch (error) {
-        console.error('Failed to delete user:', error);
-        showApiStatus('Failed to delete user. Please try again.', false);
-      }
-    });
+    } catch (error) {
+        showApiStatus('Failed to delete user.', false);
+    }
 }
 
-// ---------------- Router ----------------
+// ---------------- Router & Initialization ----------------
 async function loadPage(page){
   let content = document.getElementById('content');
-  content.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+  content.innerHTML = '<div class="text-center p-5"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
   
   try {
-    let html = '';
-    if (page === "dashboard") html = await renderDashboard();
-    else if (page === "hotels") html = await renderHotels();
-    else if (page === "rooms") html = await renderRooms();
-    else if (page === "inventory") html = await renderInventory();
-    else if (page === "bookings") html = await renderBookings();
-    else if (page === "users") html = await renderUsers();
-    
-    content.innerHTML = html;
-    updateDashboardStats();
+    const pageRenderers = {
+      dashboard: renderDashboard, hotels: renderHotels, rooms: renderRooms,
+      inventory: renderInventory, bookings: renderBookings, users: renderUsers
+    };
+    if (pageRenderers[page]) {
+      content.innerHTML = await pageRenderers[page]();
+    }
   } catch (error) {
-    console.error('Failed to load page:', error);
+    console.error(`Failed to load page: ${page}`, error);
     content.innerHTML = `<div class="alert alert-danger">Failed to load ${page}: ${error.message}</div>`;
   }
 }
 
-// Check if user is authenticated and is admin
 function checkAdminAccess() {
   const token = getAuthToken();
-  
   if (!token) {
-    alert('Please login to access the admin panel');
     window.location.href = '../login.html';
     return false;
   }
   
   try {
-    // Parse JWT token to check role
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
-    const payload = JSON.parse(jsonPayload);
-    
-    console.log('Admin check - JWT payload:', payload); // For debugging
-    
-    // Try different possible claim names for role
-    const userRole = payload.role || 
-                    payload.Role ||
-                    payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ||
-                    payload["role"];
-    
-    console.log('Admin check - User role:', userRole); // For debugging
-    
-    if (!userRole || (userRole.toLowerCase() !== 'admin' && userRole.toLowerCase() !== 'administrator')) {
+    const payload = parseJwt(token);
+    const userRole = payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+    if (!userRole || userRole.toLowerCase() !== 'admin') {
       alert('Access denied. Admin privileges required.');
       window.location.href = '../homepage.html';
       return false;
     }
-    
     return true;
   } catch (error) {
     console.error('Invalid token:', error);
-    alert('Invalid authentication token');
     window.location.href = '../login.html';
     return false;
   }
 }
 
-// Initialize the dashboard
 document.addEventListener('DOMContentLoaded', async function() {
-  // Check admin access first
-  if (!checkAdminAccess()) {
-    return;
-  }
+  if (!checkAdminAccess()) return;
   
-  // Load initial data and update dashboard
-  await loadInitialData();
+  await loadPage('dashboard');
   
-  // Add logout functionality
-  const logoutBtn = document.getElementById('logout-btn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', function() {
-      showConfirmation('Are you sure you want to logout?', function() {
-        localStorage.clear(); // Clear all localStorage data
-        window.location.href = '../login.html';
-      });
+  document.getElementById('logout-btn')?.addEventListener('click', () => {
+    showConfirmation('Are you sure you want to logout?', () => {
+      localStorage.clear();
+      window.location.href = '../login.html';
     });
-  }
-  
-  // Test API connection on load
-  try {
-    await getHotels(); // Test endpoint
-    showApiStatus('Connected to API server', true);
-  } catch (error) {
-    showApiStatus('Failed to connect to API server', false);
-  }
-})
+  });
+});
