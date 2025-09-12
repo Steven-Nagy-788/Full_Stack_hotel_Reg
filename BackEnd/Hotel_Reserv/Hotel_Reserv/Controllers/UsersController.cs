@@ -33,6 +33,7 @@ public class UsersController(IAuthService authservice) : ControllerBase
     public async ValueTask<IResult> UpdateUser(int id, CreateUserDto obj) => await authservice.UpdateUserAsync(id, obj);
 
     [HttpDelete("{id}")]
+
     [Authorize(Roles = "Admin,admin")]
     public async ValueTask<IResult> DeleteUser(int id) => await authservice.DeleteUserAsync(id);
 }
