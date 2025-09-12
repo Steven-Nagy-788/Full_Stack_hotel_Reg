@@ -32,10 +32,16 @@ loginBtn.addEventListener("click", function (e) {
       return response.text(); // نفترض الـ API بيرجع Token كنص
     })
     .then((token) => {
-      console.log("JWT Token:", token);
+      console.log("=== Login Success ===");
+      console.log("JWT Token received:", token);
+
+      // Remove quotes if the token is JSON-serialized
+      const cleanToken = token.replace(/^"(.*)"$/, '$1');
+      console.log("Clean token:", cleanToken);
 
       // حفظ التوكن في localStorage
-      localStorage.setItem("token", token);
+      localStorage.setItem("token", cleanToken);
+      console.log("Token stored in localStorage");
 
       // Decode للـ JWT علشان نجيب البيانات
       function parseJwt(token) {
@@ -57,31 +63,40 @@ loginBtn.addEventListener("click", function (e) {
         }
       }
 
-      let payload = parseJwt(token);
-console.log("JWT Payload:", payload);
+      let payload = parseJwt(cleanToken);
+      console.log("JWT Payload parsed:", payload);
+      console.log("Available keys in payload:", Object.keys(payload));
 
-localStorage.setItem("payload", JSON.stringify(payload));
+      localStorage.setItem("payload", JSON.stringify(payload));
 
-    let firstname =
-    payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"] ||
-    "User";
+      let firstname =
+        payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"] ||
+        "User";
 
-    let userEmail =
-    payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] ||
-    email.value;
+      let userEmail =
+        payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] ||
+        email.value;
 
-    localStorage.setItem("firstname", firstname);
-    localStorage.setItem("email", userEmail);
+      localStorage.setItem("firstname", firstname);
+      localStorage.setItem("email", userEmail);
 
-      // check if admin
-      if (
-        email.value.toLowerCase() === "admin@admin.com" &&
-        password.value === "admin123"
-      ) {
+      // check if admin by checking role from JWT payload
+      let userRole = payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || 
+                    payload.role || 
+                    payload.Role ||
+                    "guest";
+
+      console.log("User role detected:", userRole);
+      console.log("Is admin check:", userRole.toLowerCase() === "admin" || userRole.toLowerCase() === "administrator");
+
+      if (userRole.toLowerCase() === "admin" || userRole.toLowerCase() === "administrator") {
+        console.log("Redirecting to admin panel...");
+        alert("Admin login successful! Redirecting to admin panel...");
         setTimeout(() => {
           window.location = "Admin/admin.html";
         }, 1000);
       } else {
+        console.log("Redirecting to homepage...");
         setTimeout(() => {
           const redirectPage =
             localStorage.getItem("redirectAfterLogin") || "homepage.html";

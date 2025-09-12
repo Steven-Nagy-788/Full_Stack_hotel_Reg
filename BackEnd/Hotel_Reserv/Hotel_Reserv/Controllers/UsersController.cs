@@ -8,72 +8,32 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Hotel_Reserv.Controllers
+namespace Hotel_Reserv.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class UsersController(IAuthService authservice) : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class UsersController(IAuthService authservice) : ControllerBase
-    {
-        [HttpPost("register")]
-        public async ValueTask<ActionResult> PostUser(UserDtoReg request)
-        {
-            var user = await authservice.RegisterAsync(request);
-            if (user is null) { return BadRequest("Email already exists"); }
-            return Ok("account created");
-        }
+    [HttpPost("register")]
+    public async ValueTask<IResult> PostUser(UserDtoReg request) => await authservice.RegisterAsync(request);
 
-        [HttpPost("Login")]
-        public async ValueTask<ActionResult<string>> Login(UserDtoLog request)
-        {
-            var token = await authservice.LoginAsync(request);
-            if (token is null) { return BadRequest("invalid user name or password"); }
-            return Ok(token);
-        }
-        [HttpGet("GetAllUsers")]
-        [Authorize(Roles = "Admin")]
-        public async ValueTask<ActionResult<List<UserDto>>> GetUsers()
-        {
-            var users = await authservice.GetUsersAsync();
-            if (users == null || users.Count == 0)
-                return NotFound("No users found.");
-            return Ok(users);
-        }
+    [HttpPost("Login")]
+    public async ValueTask<IResult> Login(UserDtoLog request) => await authservice.LoginAsync(request);
 
+    [HttpGet("GetAllUsers")]
+    [Authorize(Roles = "Admin,admin")]
+    public async ValueTask<IResult> GetUsers() => await authservice.GetUsersAsync();
 
+    [HttpPost("create_User")]
+    [Authorize(Roles = "Admin,admin")]
+    public async ValueTask<IResult> CreateUser(CreateUserDto obj) => await authservice.CreateUserAsync(obj);
 
-        [HttpPost("create_User")]
-        [Authorize(Roles = "Admin")]
-        public async ValueTask<ActionResult> CreateUser(CreateUserDto obj)
-        {
-            var user = await authservice.CreateUserAsync(obj);
-            if (user is null) { return BadRequest("Email already exists"); }
-            return Ok("account created");
-        }
+    [HttpPut("UpdateUser/{id}")]
+    [Authorize(Roles = "Admin,admin")]
+    public async ValueTask<IResult> UpdateUser(int id, CreateUserDto obj) => await authservice.UpdateUserAsync(id, obj);
 
+    [HttpDelete("{id}")]
 
-
-        [HttpPut("UpdateUser_{id:int}")]
-        [Authorize(Roles = "Admin")]
-        public async ValueTask<ActionResult> UpdateUser(int id, UpdateUserDto obj)
-        {
-            if (obj is null)
-            {
-                return BadRequest("Invalid object");
-            }
-            var updatedUser = await authservice.UpdateUserAsync(id, obj);
-            if (updatedUser is null)
-            {
-                return NotFound(new { message = "User not found" });
-            }
-            return Ok(new { message = "User updated successfully", user = updatedUser });
-        }
-        [HttpDelete("{id:int}")]
-        [Authorize(Roles = "Admin")]
-        public async ValueTask<ActionResult> DeleteUser(int id)
-        {
-            var user = await authservice.DeleteUserAsync(id);
-            if (user is null) { return NotFound(); }
-            return Ok("user is deleted ");
-        }
-    }
+    [Authorize(Roles = "Admin,admin")]
+    public async ValueTask<IResult> DeleteUser(int id) => await authservice.DeleteUserAsync(id);
 }

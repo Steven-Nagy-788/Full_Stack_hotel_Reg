@@ -4,14 +4,13 @@ namespace Hotel_Reserv.Models;
 public class RoomType
 {
     public int Id { get; set; }
-    public string Name { get; set; }=string.Empty;
-    public int Capacity { get; set; }
-    public string Bed_type { get; set; } = string.Empty;
+    public string? Name { get; set; }
+    public string? Capacity { get; set; }
     public decimal Base_Price { get; set; }
-    public string Description { get; set; } = string.Empty;
+    public string? Description { get; set; }
     public int HotelId { get; set; }
     [JsonIgnore]
-    public Hotel Hotel { get; set; } = null!;
+    public Hotel? Hotel { get; set; }
     [JsonIgnore]
     public ICollection<RoomInventory> RoomInventories { get; set; } = new List<RoomInventory>();
     public ICollection<Booking> Bookings { get; set; } = new List<Booking>();

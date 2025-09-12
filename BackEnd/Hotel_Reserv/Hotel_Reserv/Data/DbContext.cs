@@ -19,12 +19,6 @@ namespace Hotel_Reserv.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Hotel - User (Admin creates Hotels)
-            modelBuilder.Entity<Hotel>()
-                .HasOne(h => h.Admin_Id)
-                .WithMany(u => u.Hotels)
-                .HasForeignKey(h => h.CreatedById)
-                .OnDelete(DeleteBehavior.Restrict); // deleting Admin doesn't delete Hotels
 
             // Hotel - RoomType
             modelBuilder.Entity<RoomType>()
@@ -32,7 +26,12 @@ namespace Hotel_Reserv.Data
                 .WithMany(h => h.RoomTypes)
                 .HasForeignKey(rt => rt.HotelId)
                 .OnDelete(DeleteBehavior.Cascade); // deleting Hotel deletes RoomTypes
-
+                                                   // Hotel - User (Admin creates Hotels)
+            modelBuilder.Entity<Hotel>()
+                .HasOne(h => h.Admin)
+                .WithMany(u => u.Hotels)
+                .HasForeignKey(h => h.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict); // deleting Admin doesn't delete Hotels
             // RoomType - RoomInventory
             modelBuilder.Entity<RoomInventory>()
                 .HasOne(ri => ri.RoomType)

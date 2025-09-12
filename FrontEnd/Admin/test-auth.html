@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Auth</title>
+</head>
+<body>
+  <h1>Auth Test Page</h1>
+  <div id="results"></div>
+  
+  <script>
+    // Get auth token from localStorage
+    function getAuthToken() {
+      const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+      console.log('getAuthToken called - token found:', !!token);
+      if (!token) {
+        console.log('No token in localStorage. Available keys:', Object.keys(localStorage));
+      }
+      return token;
+    }
+
+    function checkAdminAccess() {
+      console.log('=== Admin Access Check Started ===');
+      
+      const token = getAuthToken();
+      console.log('Token found:', !!token);
+      console.log('Token value:', token ? token.substring(0, 50) + '...' : 'null');
+      
+      if (!token) {
+        console.log('No token found');
+        return false;
+      }
+      
+      try {
+        // Parse JWT token to check role
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        const payload = JSON.parse(jsonPayload);
+        
+        console.log('Admin check - JWT payload:', payload);
+        console.log('Available keys in payload:', Object.keys(payload));
+        
+        // Try different possible claim names for role
+        const userRole = payload.role || 
+                        payload.Role ||
+                        payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ||
+                        payload["role"];
+        
+        console.log('Admin check - User role found:', userRole);
+        console.log('Role check result:', userRole ? userRole.toLowerCase() : 'no role');
+        
+        if (!userRole || (userRole.toLowerCase() !== 'admin' && userRole.toLowerCase() !== 'administrator')) {
+          console.log('Access denied - not admin role');
+          return false;
+        }
+        
+        console.log('Admin access granted!');
+        return true;
+      } catch (error) {
+        console.error('Token parsing error:', error);
+        return false;
+      }
+    }
+
+    // Test on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('=== Test Page Loaded ===');
+      
+      const result = checkAdminAccess();
+      document.getElementById('results').innerHTML = `
+        <p>Auth Check Result: ${result ? 'PASSED' : 'FAILED'}</p>
+        <p>Token exists: ${!!getAuthToken()}</p>
+        <p>Check console for details</p>
+      `;
+    });
+  </script>
+</body>
+</html>
